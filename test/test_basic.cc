@@ -65,7 +65,8 @@ void metal_adder::init_with_device(MTL::Device *device){
     NS::Error* error;
     this->_device = device;
 
-    auto lib = _device->newDefaultLibrary();
+	const NS::String* lib_path = NS::String::string("/Users/ClaytonKnittel/Documents/g2d/build/test/libg2d_unit_testing_shaders.metallib", NS::StringEncoding::ASCIIStringEncoding);
+    auto lib = _device->newLibrary(lib_path, &error);
     if(!lib){
         std::cerr << "Failed to load Default Library\n";
         std::exit(-1);
