@@ -154,7 +154,7 @@ target_include_directories(g2d
 
 target_link_libraries(g2d
 	PRIVATE
-		Freetype glfw glew ${OPENGL_LIBRARIES}
+		${FREETYPE_LIBRARIES} glfw GLEW ${OPENGL_LIBRARIES}
 	PUBLIC
 		"${LINK_LIBS}"
 )
