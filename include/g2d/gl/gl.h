@@ -34,40 +34,16 @@ int gl_init(gl_context_t* context, GLint width, GLint height);
 void gl_exit(gl_context_t* context);
 
 
-static void gl_set_bg_color(color_t color) {
-    glClearColor(color_r(color), color_g(color),
-                 color_b(color), color_a(color));
-}
+void gl_set_bg_color(color_t color);
 
-
-void _gl_key_callback_proxy(GLFWwindow* w, int key, int action, int scancode,
-        int mods);
-
-static void gl_register_key_callback(gl_context_t* c,
+void gl_register_key_callback(gl_context_t* c,
         void (*callback)(gl_context_t*, int key, int action, int scancode,
-            int mods)) {
+            int mods));
 
-    c->key_callback = callback;
-    glfwSetKeyCallback(c->window, &_gl_key_callback_proxy);
-}
+void gl_clear(gl_context_t* c);
 
+void gl_render(gl_context_t* c);
 
-static void gl_clear(gl_context_t* c) {
-    glClear(GL_COLOR_BUFFER_BIT);
-    width_height wh = c->wh;
-    glViewport(0, 0, wh.w, wh.h);
-}
-
-
-static void gl_render(gl_context_t* c) {
-    // Swap buffers
-    glfwSwapBuffers(c->window);
-}
-
-
-static int gl_should_exit(gl_context_t* c) {
-    return glfwGetKey(c->window, GLFW_KEY_ESCAPE) == GLFW_PRESS ||
-        glfwWindowShouldClose(c->window);
-}
+int gl_should_exit(gl_context_t* c);
 
 #endif /* _MGL_H */

@@ -15,9 +15,6 @@ else()
 endif()
 
 find_library(check check REQUIRED)
-find_library(glfw glfw REQUIRED)
-find_package(OpenGL REQUIRED)
-find_package(GLEW REQUIRED)
 
 file(GLOB_RECURSE C_TEST_SRC
 	"${PROJECT_SOURCE_DIR}/test_*.c"
@@ -32,8 +29,8 @@ add_custom_target(run_g2d_tests
 )
 
 target_compile_options(g2d_unit_testing PRIVATE
-	-Wpedantic -Wall -Wextra -Wno-unused-function -Wno-format -Wno-format-pedantic
-	-Wno-gnu-zero-variadic-macro-arguments -march=native -mtune=native
+	-Wpedantic -Wall -Wextra -Wno-unused-function -Wno-format
+	-march=native -mtune=native
 )
 target_compile_options(g2d_unit_testing PRIVATE $<$<COMPILE_LANGUAGE:C>:-std=gnu11>)
 
@@ -42,7 +39,6 @@ target_compile_definitions(g2d_unit_testing PRIVATE DO_TESTING)
 target_include_directories(g2d_unit_testing
 	PUBLIC
 		"/usr/local/include"
-		${OPENGL_INCLUDE_DIR}
 )
 
 target_include_directories(g2d_unit_testing
@@ -56,7 +52,7 @@ target_link_directories(g2d_unit_testing
 
 target_link_libraries(g2d_unit_testing
 	PRIVATE
-		g2d utils check glfw glew ${OPENGL_LIBRARIES}
+		g2d utils check
 	PUBLIC
 		"${LINK_LIBS}"
 )

@@ -5,10 +5,6 @@
 
 #include <check.h>
 
-#define GLEW_STATIC
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
-
 int
 main()
 {
@@ -17,13 +13,10 @@ main()
 
 	gl_set_bg_color(0xffd3b6ff);
 
-	int counter = 0;
-
 	while (!gl_should_exit(&ctx)) {
 		gl_clear(&ctx);
 
 		gl_render(&ctx);
-		glfwPollEvents();
 	}
 
 	gl_exit(&ctx);

@@ -81,8 +81,7 @@ endif()
 
 target_compile_options(g2d PRIVATE
 	$<$<NOT:$<COMPILE_LANGUAGE:ASM>>:-Wpedantic -Wall -Wextra
-	-Wno-unused-function -Wno-format -Wno-format-pedantic -Wno-c99-extensions
-	-march=native -mtune=native>
+	-Wno-unused-function -Wno-format -march=native -mtune=native>
 )
 target_compile_options(g2d PRIVATE $<$<COMPILE_LANGUAGE:C>:-std=gnu11>)
 
@@ -138,35 +137,31 @@ if("${CMAKE_BUILD_TYPE}" MATCHES "Debug" OR "${CMAKE_BUILD_TYPE}" MATCHES "RelWi
 	target_compile_definitions(g2d PRIVATE DEBUG)
 endif()
 
-target_include_directories(g2d
-	PRIVATE
-		$<$<NOT:$<COMPILE_LANGUAGE:ASM>>:${PROJECT_SOURCE_DIR}/include>
-	PUBLIC "/usr/local/include"
-)
-
 add_subdirectory(modules/utils)
-target_include_directories(g2d
-	PRIVATE
-		${PROJECT_SOURCE_DIR}/modules/utils/include
-		/usr/local/include/freetype2
-)
 
 find_library(glfw glfw REQUIRED)
 find_package(OpenGL REQUIRED)
 find_package(GLEW REQUIRED)
 find_package(Freetype REQUIRED)
 
+target_include_directories(g2d
+	PRIVATE
+		$<$<NOT:$<COMPILE_LANGUAGE:ASM>>:${PROJECT_SOURCE_DIR}/include>
+		${PROJECT_SOURCE_DIR}/modules/utils/include
+		${FREETYPE_INCLUDE_DIRS}
+)
+
+message("LIBS: ${Freetype_FOUND} ${FREETYPE_LIBRARIES} ${GLEW_LIBRARIES} ${glfw_LIBRARIES}")
+
 target_link_libraries(g2d
 	PRIVATE
-		Freetype glfw glew ${OPENGL_LIBRARIES}
+		${FREETYPE_LIBRARIES} glfw ${GLEW_LIBRARIES} ${OPENGL_LIBRARIES}
 	PUBLIC
 		"${LINK_LIBS}"
 )
 
 if (${ENABLE_TESTING})
 	find_library(check check REQUIRED)
-
-	target_compile_options(g2d PRIVATE $<$<COMPILE_LANGUAGE:C>:-Wno-gnu-zero-variadic-macro-arguments>)
 
 	target_link_directories(g2d
 		PUBLIC "/usr/local/lib"

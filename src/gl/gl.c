@@ -10,13 +10,24 @@
 #include <g2d/gl/gl.h>
 
 
-static gl_context_t* get_window_context(GLFWwindow* w) {
+static gl_context_t*
+_get_window_context(GLFWwindow* w)
+{
     return (gl_context_t*) glfwGetWindowUserPointer(w);
 }
 
+static void
+_gl_key_callback_proxy(GLFWwindow* w, int key, int action, int scancode,
+        int mods)
+{
+	gl_context_t* c = _get_window_context(w);
+    c->key_callback(c, key, action, scancode, mods);
+}
 
-static void window_resize_cb(GLFWwindow* w, int width, int height) {
-    gl_context_t* c = get_window_context(w);
+static void
+_window_resize_cb(GLFWwindow* w, int width, int height)
+{
+    gl_context_t* c = _get_window_context(w);
     glfwGetFramebufferSize(w, &width, &height);
 
     width_height wh = {
@@ -27,7 +38,9 @@ static void window_resize_cb(GLFWwindow* w, int width, int height) {
 }
 
 
-int gl_init(gl_context_t* context, GLint width, GLint height) {
+int
+gl_init(gl_context_t* context, GLint width, GLint height)
+{
     GLFWwindow* window;
 
     if (!glfwInit()) {
@@ -63,7 +76,7 @@ int gl_init(gl_context_t* context, GLint width, GLint height) {
 
     glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
 
-    glfwSetWindowSizeCallback(window, &window_resize_cb);
+    glfwSetWindowSizeCallback(window, &_window_resize_cb);
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -81,17 +94,51 @@ int gl_init(gl_context_t* context, GLint width, GLint height) {
     return 0;
 }
 
-void gl_exit(gl_context_t* context) {
+void
+gl_exit(gl_context_t* context)
+{
     glfwDestroyWindow(context->window);
     glfwTerminate();
 }
 
+void
+gl_set_bg_color(color_t color)
+{
+    glClearColor(color_r(color), color_g(color),
+                 color_b(color), color_a(color));
+}
+
+void
+gl_register_key_callback(gl_context_t* c,
+        void (*callback)(gl_context_t*, int key, int action, int scancode,
+            int mods))
+{
+    c->key_callback = callback;
+    glfwSetKeyCallback(c->window, &_gl_key_callback_proxy);
+}
+
+void
+gl_clear(gl_context_t* c)
+{
+    glClear(GL_COLOR_BUFFER_BIT);
+    width_height wh = c->wh;
+    glViewport(0, 0, wh.w, wh.h);
+}
 
 
-void _gl_key_callback_proxy(GLFWwindow* w, int key, int action, int scancode,
-        int mods) {
+void
+gl_render(gl_context_t* c)
+{
+    // Swap buffers
+    glfwSwapBuffers(c->window);
+	glfwPollEvents();
+}
 
-	gl_context_t* c = get_window_context(w);
-    c->key_callback(c, key, action, scancode, mods);
+
+int
+gl_should_exit(gl_context_t* c)
+{
+    return glfwGetKey(c->window, GLFW_KEY_ESCAPE) == GLFW_PRESS ||
+        glfwWindowShouldClose(c->window);
 }
 
