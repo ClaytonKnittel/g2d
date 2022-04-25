@@ -142,20 +142,19 @@ add_subdirectory(modules/utils)
 find_library(glfw glfw REQUIRED)
 find_package(OpenGL REQUIRED)
 find_package(GLEW REQUIRED)
-find_package(Freetype REQUIRED)
+find_package(Freetype MODULE REQUIRED)
 
 target_include_directories(g2d
 	PRIVATE
 		$<$<NOT:$<COMPILE_LANGUAGE:ASM>>:${PROJECT_SOURCE_DIR}/include>
 		${PROJECT_SOURCE_DIR}/modules/utils/include
 		${FREETYPE_INCLUDE_DIRS}
+		"/usr/local/include"
 )
-
-message("LIBS: ${Freetype_FOUND} ${FREETYPE_LIBRARIES} ${GLEW_LIBRARIES} ${glfw_LIBRARIES}")
 
 target_link_libraries(g2d
 	PRIVATE
-		${FREETYPE_LIBRARIES} glfw ${GLEW_LIBRARIES} ${OPENGL_LIBRARIES}
+		Freetype glfw glew ${OPENGL_LIBRARIES}
 	PUBLIC
 		"${LINK_LIBS}"
 )
