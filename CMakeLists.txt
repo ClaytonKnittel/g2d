@@ -44,11 +44,34 @@ set(ENABLE_AVX "CHECK" CACHE STRING "When enabled, builds certain methods using 
 
 
 ############################################################
+# Parameters
+############################################################
+
+set(METAL_PLATFORMS Darwin)
+set(OPENGL_PLATFORMS Linux)
+
+# check for graphics library support
+set(USE_METAL OFF)
+set(USE_OPENGL OFF)
+
+if(CMAKE_SYSTEM_NAME IN_LIST METAL_PLATFORMS)
+	set(USE_METAL ON)
+elseif(CMAKE_SYSTEM_NAME IN_LIST OPENGL_PLATFORMS)
+	set(USE_OPENGL ON)
+else()
+	message(SEND_ERROR "System not supported: ${CMAKE_SYSTEM_NAME}")
+endif()
+
+
+############################################################
 # Build Rules
 ############################################################
 
 file(GLOB_RECURSE C_SRC
 	"${PROJECT_SOURCE_DIR}/src/*.c"
+)
+file(GLOB_RECURSE CXX_SRC
+	"${PROJECT_SOURCE_DIR}/src/*.cc"
 )
 file(GLOB_RECURSE ASM_SRC
 	"${PROJECT_SOURCE_DIR}/src/*.s"
@@ -56,15 +79,30 @@ file(GLOB_RECURSE ASM_SRC
 
 # remove arch_test dir
 list(FILTER C_SRC EXCLUDE REGEX "^${PROJECT_SOURCE_DIR}/src/arch_test/*")
+list(FILTER CXX_SRC EXCLUDE REGEX "^${PROJECT_SOURCE_DIR}/src/arch_test/*")
 list(FILTER ASM_SRC EXCLUDE REGEX "^${PROJECT_SOURCE_DIR}/src/arch_test/*")
+
+# remove opengl/metal specific directories if not in use
+if(NOT USE_METAL)
+	list(FILTER C_SRC EXCLUDE REGEX "^${PROJECT_SOURCE_DIR}/src/metal/*")
+	list(FILTER CXX_SRC EXCLUDE REGEX "^${PROJECT_SOURCE_DIR}/src/metal/*")
+	list(FILTER ASM_SRC EXCLUDE REGEX "^${PROJECT_SOURCE_DIR}/src/metal/*")
+endif()
+
+if(NOT USE_OPENGL)
+	list(FILTER C_SRC EXCLUDE REGEX "^${PROJECT_SOURCE_DIR}/src/opengl/*")
+	list(FILTER CXX_SRC EXCLUDE REGEX "^${PROJECT_SOURCE_DIR}/src/opengl/*")
+	list(FILTER ASM_SRC EXCLUDE REGEX "^${PROJECT_SOURCE_DIR}/src/opengl/*")
+endif()
+
 
 if(${BUILD_SHARED_LIBRARY})
 	add_library(g2d SHARED
-		${C_SRC} ${ASM_SRC}
+		${C_SRC} ${CXX_SRC} ${ASM_SRC}
 	)
 else()
 	add_library(g2d STATIC
-		${C_SRC} ${ASM_SRC}
+		${C_SRC} ${CXX_SRC} ${ASM_SRC}
 	)
 endif()
 
@@ -84,6 +122,14 @@ target_compile_options(g2d PRIVATE
 	-Wno-unused-function -Wno-format -march=native -mtune=native>
 )
 target_compile_options(g2d PRIVATE $<$<COMPILE_LANGUAGE:C>:-std=gnu11>)
+target_compile_options(g2d
+	PRIVATE
+		$<$<COMPILE_LANGUAGE:CXX>:-Wno-extra-semi -Wno-c99-extensions>
+	PUBLIC
+		$<$<COMPILE_LANGUAGE:CXX>:-Wno-nested-anon-types -Wno-ignored-qualifiers
+		-Wno-gnu-anonymous-struct -Wno-unused-parameter -Wno-newline-eof
+		-Wno-c++11-extensions -Wno-c++14-extensions -Wno-c++17-extensions>
+)
 
 if("${CMAKE_ASM_COMPILER_ID}" MATCHES "GNU")
 	set(ASM_OPTIONS -Wa,--64 -Wa,-msyntax=intel -Wa,-mnaked-reg)
@@ -137,6 +183,22 @@ if("${CMAKE_BUILD_TYPE}" MATCHES "Debug" OR "${CMAKE_BUILD_TYPE}" MATCHES "RelWi
 	target_compile_definitions(g2d PRIVATE DEBUG)
 endif()
 
+include(CheckCXXCompilerFlag)
+CHECK_CXX_COMPILER_FLAG("-std=c++17" COMPILER_SUPPORTS_CXX17)
+
+if (COMPILER_SUPPORTS_CXX17)
+	target_compile_options(g2d PRIVATE $<$<COMPILE_LANGUAGE:CXX>:-std=c++17>)
+else()
+	message(SEND_ERROR "The compiler ${CMAKE_CXX_COMPILER} does not support "
+		"c++17, please use a different compiler")
+endif()
+
+if(USE_METAL)
+	target_compile_definitions(g2d PUBLIC USE_METAL)
+elseif(USE_OPENGL)
+	target_compile_definitions(g2d PUBLIC USE_OPENGL)
+endif()
+
 add_subdirectory(modules/utils)
 
 find_library(glfw glfw REQUIRED)
@@ -146,18 +208,31 @@ find_package(Freetype MODULE REQUIRED)
 
 target_include_directories(g2d
 	PRIVATE
-		$<$<NOT:$<COMPILE_LANGUAGE:ASM>>:${PROJECT_SOURCE_DIR}/include>
-		${PROJECT_SOURCE_DIR}/modules/utils/include
 		${FREETYPE_INCLUDE_DIRS}
 		"/usr/local/include"
+	PUBLIC
+		$<$<NOT:$<COMPILE_LANGUAGE:ASM>>:${PROJECT_SOURCE_DIR}/include>
+		${PROJECT_SOURCE_DIR}/modules/metal-cpp
 )
 
 target_link_libraries(g2d
 	PRIVATE
-		${FREETYPE_LIBRARIES} glfw GLEW ${OPENGL_LIBRARIES}
+		${FREETYPE_LIBRARIES}
 	PUBLIC
 		"${LINK_LIBS}"
 )
+
+if(USE_METAL)
+	target_link_libraries(g2d
+		PUBLIC
+			"-framework Foundation" "-framework QuartzCore" "-framework Metal"
+	)
+elseif(USE_OPENGL)
+	target_link_libraries(g2d
+		PRIVATE
+			glfw GLEW ${OPENGL_LIBRARIES}
+	)
+endif()
 
 if (${ENABLE_TESTING})
 	find_library(check check REQUIRED)

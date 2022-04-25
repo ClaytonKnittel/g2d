@@ -4,8 +4,8 @@
 #include <freetype2/ft2build.h>
 #include FT_FREETYPE_H
 
-#include <g2d/gl/shader.h>
-#include <g2d/gl/color.h>
+#include <g2d/opengl/shader.h>
+#include <g2d/opengl/color.h>
 
 
 // maximum number of characters that can be drawn in 1 draw call

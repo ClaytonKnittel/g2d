@@ -7,7 +7,7 @@
 #include <GLFW/glfw3.h>
 
 
-#include <g2d/gl/gl.h>
+#include <g2d/opengl/gl.h>
 
 
 static gl_context_t*

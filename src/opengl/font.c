@@ -4,8 +4,8 @@
 #include <GLFW/glfw3.h>
 
 #include <g2d/utils.h>
-#include <g2d/gl/color.h>
-#include <g2d/gl/font.h>
+#include <g2d/opengl/color.h>
+#include <g2d/opengl/font.h>
 
 
 // number of floats sent to GPU per vertex being drawn

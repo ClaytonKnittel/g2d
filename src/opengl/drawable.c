@@ -1,7 +1,7 @@
 
 #include <assert.h>
 
-#include <g2d/gl/drawable.h>
+#include <g2d/opengl/drawable.h>
 
 
 static_assert(sizeof(uint32_t) == sizeof(GLfloat), "GLfloat must be 32 bits");

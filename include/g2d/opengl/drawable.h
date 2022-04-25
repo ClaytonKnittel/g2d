@@ -5,8 +5,8 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-#include <g2d/gl/shader.h>
-#include <g2d/gl/color.h>
+#include <g2d/opengl/shader.h>
+#include <g2d/opengl/color.h>
 
 typedef struct drawable {
     GLuint vao, vbo;

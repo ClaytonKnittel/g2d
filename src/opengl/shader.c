@@ -5,7 +5,7 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-#include <g2d/gl/shader.h>
+#include <g2d/opengl/shader.h>
 
 #define MAX_FILE_SIZE 4096
 

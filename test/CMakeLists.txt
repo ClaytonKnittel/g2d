@@ -19,9 +19,12 @@ find_library(check check REQUIRED)
 file(GLOB_RECURSE C_TEST_SRC
 	"${PROJECT_SOURCE_DIR}/test_*.c"
 )
+file(GLOB_RECURSE CXX_TEST_SRC
+	"${PROJECT_SOURCE_DIR}/test_*.cc"
+)
 
 add_executable(g2d_unit_testing
-	${C_TEST_SRC}
+	${C_TEST_SRC} ${CXX_TEST_SRC}
 )
 
 add_custom_target(run_g2d_tests
@@ -34,16 +37,21 @@ target_compile_options(g2d_unit_testing PRIVATE
 )
 target_compile_options(g2d_unit_testing PRIVATE $<$<COMPILE_LANGUAGE:C>:-std=gnu11>)
 
+include(CheckCXXCompilerFlag)
+CHECK_CXX_COMPILER_FLAG("-std=c++17" COMPILER_SUPPORTS_CXX17)
+
+if (COMPILER_SUPPORTS_CXX17)
+	target_compile_options(g2d_unit_testing PRIVATE $<$<COMPILE_LANGUAGE:CXX>:-std=c++17>)
+else()
+	message(SEND_ERROR "The compiler ${CMAKE_CXX_COMPILER} does not support "
+		"c++17, please use a different compiler")
+endif()
+
 target_compile_definitions(g2d_unit_testing PRIVATE DO_TESTING)
 
 target_include_directories(g2d_unit_testing
 	PUBLIC
 		"/usr/local/include"
-)
-
-target_include_directories(g2d_unit_testing
-	PRIVATE
-		${PROJECT_SOURCE_DIR}/../modules/utils/include
 )
 
 target_link_directories(g2d_unit_testing
@@ -64,4 +72,19 @@ target_include_directories(g2d_unit_testing
 		${UTILS_DIR}/include
 )
 
+
+project(g2d_unit_testing_shaders)
+
+file(GLOB_RECURSE METAL_TEST_SRC
+	"${PROJECT_SOURCE_DIR}/test_*.metal"
+)
+
+add_library(g2d_unit_testing_shaders SHARED
+	${METAL_TEST_SRC}
+)
+
+set_target_properties(g2d_unit_testing_shaders PROPERTIES SUFFIX ".metallib")
+
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+enable_language(METAL)
 
