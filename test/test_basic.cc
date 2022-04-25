@@ -31,7 +31,7 @@ private:
 
 };
 
-const unsigned int vector_length = 1 << 10;
+const unsigned int vector_length = 1u << 10;
 auto buffer_size = vector_length*sizeof(float);
 
 void metal_adder::random_number_generator(MTL::Buffer *buffer){
@@ -65,7 +65,8 @@ void metal_adder::init_with_device(MTL::Device *device){
     NS::Error* error;
     this->_device = device;
 
-	const NS::String* lib_path = NS::String::string("/Users/ClaytonKnittel/Documents/g2d/build/test/libg2d_unit_testing_shaders.metallib", NS::StringEncoding::ASCIIStringEncoding);
+	const NS::String* lib_path = NS::String::string("/Users/ClaytonKnittel/Documents/g2d/build/test/libg2d_unit_testing_shaders.metallib",
+			NS::StringEncoding::ASCIIStringEncoding);
     auto lib = _device->newLibrary(lib_path, &error);
     if(!lib){
         std::cerr << "Failed to load Default Library\n";
@@ -148,6 +149,7 @@ main()
 
     std::cout << " End of Computation  " << std::endl;
     p_pool->release();
+
 #endif
 
 	return 0;
