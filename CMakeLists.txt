@@ -56,7 +56,6 @@ file(GLOB_RECURSE ASM_SRC
 
 # remove arch_test dir
 list(FILTER C_SRC EXCLUDE REGEX "^${PROJECT_SOURCE_DIR}/src/arch_test/*")
-list(FILTER CXX_SRC EXCLUDE REGEX "^${PROJECT_SOURCE_DIR}/src/arch_test/*")
 list(FILTER ASM_SRC EXCLUDE REGEX "^${PROJECT_SOURCE_DIR}/src/arch_test/*")
 
 if(${BUILD_SHARED_LIBRARY})
@@ -149,6 +148,19 @@ add_subdirectory(modules/utils)
 target_include_directories(g2d
 	PRIVATE
 		${PROJECT_SOURCE_DIR}/modules/utils/include
+		/usr/local/include/freetype2
+)
+
+find_library(glfw glfw REQUIRED)
+find_package(OpenGL REQUIRED)
+find_package(GLEW REQUIRED)
+find_package(Freetype REQUIRED)
+
+target_link_libraries(g2d
+	PRIVATE
+		Freetype glfw glew ${OPENGL_LIBRARIES}
+	PUBLIC
+		"${LINK_LIBS}"
 )
 
 if (${ENABLE_TESTING})

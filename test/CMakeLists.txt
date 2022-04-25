@@ -27,7 +27,7 @@ add_executable(g2d_unit_testing
 	${C_TEST_SRC}
 )
 
-add_custom_target(run_phys_tests
+add_custom_target(run_g2d_tests
 	${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME} DEPENDS g2d_unit_testing
 )
 
@@ -56,7 +56,7 @@ target_link_directories(g2d_unit_testing
 
 target_link_libraries(g2d_unit_testing
 	PRIVATE
-		utils check glfw glew ${OPENGL_LIBRARIES}
+		g2d utils check glfw glew ${OPENGL_LIBRARIES}
 	PUBLIC
 		"${LINK_LIBS}"
 )

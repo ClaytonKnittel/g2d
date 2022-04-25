@@ -1,11 +1,11 @@
 #ifndef _GL_FONT_H
 #define _GL_FONT_H
 
-#include <ft2build.h>
+#include <freetype2/ft2build.h>
 #include FT_FREETYPE_H
 
-#include <gl/shader.h>
-#include <gl/color.h>
+#include <g2d/gl/shader.h>
+#include <g2d/gl/color.h>
 
 
 // maximum number of characters that can be drawn in 1 draw call

@@ -3,9 +3,9 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-#include <util.h>
-#include <gl/color.h>
-#include <gl/font.h>
+#include <g2d/utils.h>
+#include <g2d/gl/color.h>
+#include <g2d/gl/font.h>
 
 
 // number of floats sent to GPU per vertex being drawn
@@ -118,8 +118,8 @@ int font_init(font_t *f, const char * font_path, uint64_t font_height) {
         glyph * g = &f->glyphs[idx];
         uint8_t * b = (uint8_t *) face->glyph->bitmap.buffer;
 
-        for (int row = 0; row < g->h; row++) {
-            for (int col = 0; col < g->w; col++) {
+        for (uint32_t row = 0; row < g->h; row++) {
+            for (uint32_t col = 0; col < g->w; col++) {
                 tex_buf[(row + g->y_off) * f->tex_width + (col + g->x_off)] =
                     b[(g->h - row - 1) * g->w + col];
             }

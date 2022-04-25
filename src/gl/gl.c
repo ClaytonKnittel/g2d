@@ -7,16 +7,16 @@
 #include <GLFW/glfw3.h>
 
 
-#include <gl/gl.h>
+#include <g2d/gl/gl.h>
 
 
-static gl_context * get_window_context(GLFWwindow *w) {
-    return (gl_context*) glfwGetWindowUserPointer(w);
+static gl_context_t* get_window_context(GLFWwindow* w) {
+    return (gl_context_t*) glfwGetWindowUserPointer(w);
 }
 
 
-static void window_resize_cb(GLFWwindow *w, int width, int height) {
-    gl_context * c = get_window_context(w);
+static void window_resize_cb(GLFWwindow* w, int width, int height) {
+    gl_context_t* c = get_window_context(w);
     glfwGetFramebufferSize(w, &width, &height);
 
     width_height wh = {
@@ -27,8 +27,8 @@ static void window_resize_cb(GLFWwindow *w, int width, int height) {
 }
 
 
-int gl_init(gl_context *context, GLint width, GLint height) {
-    GLFWwindow * window;
+int gl_init(gl_context_t* context, GLint width, GLint height) {
+    GLFWwindow* window;
 
     if (!glfwInit()) {
         fprintf(stderr, "GLFW window could not be initialized\n");
@@ -81,17 +81,17 @@ int gl_init(gl_context *context, GLint width, GLint height) {
     return 0;
 }
 
-void gl_exit(gl_context *context) {
+void gl_exit(gl_context_t* context) {
     glfwDestroyWindow(context->window);
     glfwTerminate();
 }
 
 
 
-void _gl_key_callback_proxy(GLFWwindow *w, int key, int action, int scancode,
+void _gl_key_callback_proxy(GLFWwindow* w, int key, int action, int scancode,
         int mods) {
 
-    gl_context * c = get_window_context(w);
+	gl_context_t* c = get_window_context(w);
     c->key_callback(c, key, action, scancode, mods);
 }
 
