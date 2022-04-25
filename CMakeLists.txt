@@ -213,6 +213,7 @@ target_include_directories(g2d
 	PUBLIC
 		$<$<NOT:$<COMPILE_LANGUAGE:ASM>>:${PROJECT_SOURCE_DIR}/include>
 		${PROJECT_SOURCE_DIR}/modules/metal-cpp
+		${PROJECT_SOURCE_DIR}/modules/metal-cpp-extensions
 )
 
 target_link_libraries(g2d
@@ -225,7 +226,7 @@ target_link_libraries(g2d
 if(USE_METAL)
 	target_link_libraries(g2d
 		PUBLIC
-			"-framework Foundation" "-framework QuartzCore" "-framework Metal"
+			"-framework Foundation" "-framework QuartzCore" "-framework Metal -framework MetalKit"
 	)
 elseif(USE_OPENGL)
 	target_link_libraries(g2d
