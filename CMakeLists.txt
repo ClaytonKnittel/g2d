@@ -38,9 +38,6 @@ set(BUILD_SHARED_LIBRARY ON CACHE BOOL "When enabled, builds libg2d as a
 set(ENABLE_TESTING OFF CACHE BOOL "When enabled, build all unit tests. The
 	unit tests can then be run from within the build directory with
 	'make run_tests'.")
-set(ENABLE_AVX "CHECK" CACHE STRING "When enabled, builds certain methods using the
-	AVX instruction set. Can disable this manually, but AVX support is
-	automatically checked.")
 
 
 ############################################################
@@ -140,40 +137,6 @@ else()
 endif()
 
 target_compile_options(g2d PRIVATE $<$<COMPILE_LANGUAGE:ASM>:${ASM_OPTIONS}>)
-
-if("${ENABLE_AVX}" MATCHES "CHECK")
-	set(OLD_CMAKE_ASM_FLAGS "${CMAKE_ASM_FLAGS}")
-	set(CMAKE_ASM_FLAGS "${ASM_OPTIONS}")
-
-	# check to see if this architecture supports AVX
-	try_compile(AVX_SUPPORTED ${CMAKE_CURRENT_BINARY_DIR} SOURCES
-		${PROJECT_SOURCE_DIR}/src/arch_test/test_avx.s
-		${PROJECT_SOURCE_DIR}/src/arch_test/test_empty.c)
-
-	if (AVX_SUPPORTED)
-		message(VERBOSE "AVX is supported on this architecture/compiler config")
-	else()
-		message(VERBOSE "AVX is not supported on this architecture/compiler config")
-	endif()
-	set(CMAKE_ASM_FLAGS "${OLD_CMAKE_ASM_FLAGS}")
-	unset(OLD_CMAKE_ASM_FLAGS)
-
-	if(${AVX_SUPPORTED})
-		set(ENABLE_AVX "ON" CACHE STRING "When enabled, builds certain methods using the
-			AVX instruction set. Can disable this manually, but AVX support is
-			automatically checked." FORCE)
-	else()
-		set(ENABLE_AVX "OFF" CACHE STRING "When enabled, builds certain methods using the
-			AVX instruction set. Can disable this manually, but AVX support is
-			automatically checked." FORCE)
-	endif()
-elseif("${ENABLE_AVX}" MATCHES "ON")
-	set(AVX_SUPPORTED ON)
-elseif("${ENABLE_AVX}" MATCHES "OFF")
-	set(AVX_SUPPORTED OFF)
-else()
-	message(SEND_ERROR "ENABLE_AVX must be one of \"ON\", \"OFF\", or \"CHECK\"")
-endif()
 
 if (${ENABLE_TESTING})
 	target_compile_definitions(g2d PRIVATE DO_TESTING)
