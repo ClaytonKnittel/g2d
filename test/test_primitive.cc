@@ -24,11 +24,11 @@
 
 #pragma region Declarations {
 
-class Renderer
+class MyRenderer
 {
     public:
-        Renderer( MTL::Device* pDevice );
-        ~Renderer();
+        MyRenderer( MTL::Device* pDevice );
+        ~MyRenderer();
         void buildShaders();
         void buildBuffers();
         void draw( MTK::View* pView );
@@ -49,7 +49,7 @@ class MyMTKViewDelegate : public MTK::ViewDelegate
         virtual void drawInMTKView( MTK::View* pView ) override;
 
     private:
-        Renderer* _pRenderer;
+        MyRenderer* _pRenderer;
 };
 
 class MyAppDelegate : public NS::ApplicationDelegate
@@ -191,7 +191,7 @@ bool MyAppDelegate::applicationShouldTerminateAfterLastWindowClosed( NS::Applica
 
 MyMTKViewDelegate::MyMTKViewDelegate( MTL::Device* pDevice )
 : MTK::ViewDelegate()
-, _pRenderer( new Renderer( pDevice ) )
+, _pRenderer( new MyRenderer( pDevice ) )
 {
 }
 
@@ -208,10 +208,10 @@ void MyMTKViewDelegate::drawInMTKView( MTK::View* pView )
 #pragma endregion ViewDelegate }
 
 
-#pragma mark - Renderer
-#pragma region Renderer {
+#pragma mark - MyRenderer
+#pragma region MyRenderer {
 
-Renderer::Renderer( MTL::Device* pDevice )
+MyRenderer::MyRenderer( MTL::Device* pDevice )
 : _pDevice( pDevice->retain() )
 {
     _pCommandQueue = _pDevice->newCommandQueue();
@@ -219,7 +219,7 @@ Renderer::Renderer( MTL::Device* pDevice )
     buildBuffers();
 }
 
-Renderer::~Renderer()
+MyRenderer::~MyRenderer()
 {
     _pVertexPositionsBuffer->release();
     _pVertexColorsBuffer->release();
@@ -228,7 +228,7 @@ Renderer::~Renderer()
     _pDevice->release();
 }
 
-void Renderer::buildShaders()
+void MyRenderer::buildShaders()
 {
     using NS::StringEncoding::UTF8StringEncoding;
 
@@ -266,7 +266,7 @@ void Renderer::buildShaders()
     pLibrary->release();
 }
 
-void Renderer::buildBuffers()
+void MyRenderer::buildBuffers()
 {
     const size_t NumVertices = 3;
 
@@ -300,7 +300,7 @@ void Renderer::buildBuffers()
     _pVertexColorsBuffer->didModifyRange( NS::Range::Make( 0, _pVertexColorsBuffer->length() ) );
 }
 
-void Renderer::draw( MTK::View* pView )
+void MyRenderer::draw( MTK::View* pView )
 {
     NS::AutoreleasePool* pPool = NS::AutoreleasePool::alloc()->init();
 
@@ -320,4 +320,4 @@ void Renderer::draw( MTK::View* pView )
     pPool->release();
 }
 
-#pragma endregion Renderer }
+#pragma endregion MyRenderer }

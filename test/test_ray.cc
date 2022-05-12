@@ -9,23 +9,25 @@ private:
 	MTL::Device* m_device;
 	MTL::CommandQueue* m_command_queue;
 	MTL::RenderPipelineState* m_pipeline_state;
+	MTL::Library* m_library;
 	MTL::Buffer* m_vertex_buf;
 	MTL::Buffer* m_color_buf;
+	MTL::Buffer* m_arg_buf;
 
 	static constexpr const char* shader_lib_path =
 		"/Users/claytonknittel/VSCode/g2d/build/test/libg2d_unit_testing_shaders.metallib";
 
 	void getShaders() {
 		NS::Error* err = nullptr;
-		MTL::Library* library = m_device->newLibrary(NS::String::string(shader_lib_path,
+		m_library = m_device->newLibrary(NS::String::string(shader_lib_path,
 					NS::StringEncoding::ASCIIStringEncoding), &err);
-		if (library == nullptr) {
+		if (m_library == nullptr) {
 			printf("%s\n", err->localizedDescription()->utf8String());
 		}
 
-		MTL::Function* vertex_fn = library->newFunction(NS::String::string("rayVertex",
+		MTL::Function* vertex_fn = m_library->newFunction(NS::String::string("rayVertex",
 					NS::UTF8StringEncoding));
-		MTL::Function* fragment_fn = library->newFunction(NS::String::string("rayFragment",
+		MTL::Function* fragment_fn = m_library->newFunction(NS::String::string("rayFragment",
 					NS::UTF8StringEncoding));
 
 		if (vertex_fn == nullptr) {
@@ -47,7 +49,6 @@ private:
 			printf("%s", err->localizedDescription()->utf8String());
 		}
 
-		library->release();
 		desc->release();
 		fragment_fn->release();
 		vertex_fn->release();
@@ -78,6 +79,24 @@ private:
 
 		m_vertex_buf->didModifyRange(NS::Range::Make(0, m_vertex_buf->length()));
 		m_color_buf->didModifyRange(NS::Range::Make(0, m_color_buf->length()));
+
+		MTL::Function* vertex_fn = m_library->newFunction(NS::String::string("rayVertex",
+					NS::UTF8StringEncoding));
+		MTL::ArgumentEncoder* arg_encoder = vertex_fn->newArgumentEncoder(0);
+		m_arg_buf = m_device->newBuffer(arg_encoder->encodedLength(), MTL::ResourceStorageModeManaged);
+		if (m_arg_buf == nullptr) {
+			printf("Failed to initialize arg buf\n");
+			exit(-1);
+		}
+
+		arg_encoder->setArgumentBuffer(m_arg_buf, 0);
+		arg_encoder->setBuffer(m_vertex_buf, 0, 0);
+		arg_encoder->setBuffer(m_color_buf, 0, 1);
+
+		m_arg_buf->didModifyRange(NS::Range::Make(0, m_arg_buf->length()));
+
+		arg_encoder->release();
+		vertex_fn->release();
 	}
 
 public:
@@ -90,8 +109,10 @@ public:
 
 	~Renderer()
 	{
+		m_arg_buf->release();
 		m_vertex_buf->release();
 		m_color_buf->release();
+		m_library->release();
 		m_pipeline_state->release();
 		m_command_queue->release();
 		m_device->release();
@@ -106,15 +127,16 @@ public:
 		MTL::RenderCommandEncoder* encoder =
 			cmd_buffer->renderCommandEncoder(render_pass);
 
-		static uint64_t _cnt = 0;
+		/*static uint64_t _cnt = 0;
 		uint64_t cnt = ++_cnt;
 		double val = sin((double) cnt / 100.);
 		((float*) m_color_buf->contents())[0] = (float) val;
-		m_color_buf->didModifyRange( NS::Range::Make( 0, sizeof(float) ) );
+		m_color_buf->didModifyRange( NS::Range::Make( 0, sizeof(float) ) );*/
 
 		encoder->setRenderPipelineState(m_pipeline_state);
-		encoder->setVertexBuffer(m_vertex_buf, 0, 0);
-		encoder->setVertexBuffer(m_color_buf, 0, 1);
+		encoder->setVertexBuffer(m_arg_buf, 0, 0);
+		encoder->useResource(m_vertex_buf, MTL::ResourceUsageRead);
+		encoder->useResource(m_color_buf, MTL::ResourceUsageRead);
 		encoder->drawPrimitives(MTL::PrimitiveType::PrimitiveTypeTriangle, NS::UInteger(0), NS::UInteger(3));
 
 		encoder->endEncoding();
@@ -265,42 +287,6 @@ main()
 	app->setDelegate(&del);
 	app->run();
 
-    /*NS::Error* pError = nullptr;
-	NS::URL* lib_path = NS::URL::alloc()->init(NS::String::string(
-				"/Users/claytonknittel/VSCode/g2d/build/test/"
-				"libg2d_unit_testing_shaders.metallib",
-				NS::UTF8StringEncoding));
-	MTL::Library* library = device->newLibrary(lib_path, &pError);
-	lib_path->release();
-	if (library == nullptr) {
-		fprintf(stderr, "Failed to initialize library: %s\n",
-				pError->localizedDescription()->utf8String());
-		return -1;
-	}
-
-	MTL::Function* vertex_fn = library->newFunction(NS::String::string("vertex_main", NS::UTF8StringEncoding));
-	MTL::Function* fragment_fn = library->newFunction(NS::String::string("fragment_main", NS::UTF8StringEncoding));
-
-	MTL::RenderPipelineDescriptor* pipeline =
-		MTL::RenderPipelineDescriptor::alloc()->init();
-	pipeline->colorAttachments()->object(0)->setPixelFormat(
-			MTL::PixelFormatBGRA8Unorm_sRGB);
-	pipeline->setVertexFunction(vertex_fn);
-	pipeline->setFragmentFunction(fragment_fn);
-
-	MTL::RenderPipelineState* pipeline_state =
-		device->newRenderPipelineState(pipeline, &pError);
-	if (pipeline_state == nullptr) {
-		fprintf(stderr, "Failed to initialize render pipeline state: %s\n",
-				pError->localizedDescription()->utf8String());
-		return -1;
-	}*/
-
-	/*pipeline_state->release();
-	pipeline->release();
-	fragment_fn->release();
-	vertex_fn->release();
-	library->release();*/
 	pool->release();
 
 	return 0;
