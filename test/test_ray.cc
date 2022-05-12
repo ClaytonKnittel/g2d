@@ -1,23 +1,103 @@
 
+#include <simd/simd.h>
+
 #include <g2d/metal/metal.h>
 
-class ViewDelegate : public MTK::ViewDelegate
+class Renderer
 {
 private:
 	MTL::Device* m_device;
 	MTL::CommandQueue* m_command_queue;
+	MTL::RenderPipelineState* m_pipeline_state;
+	MTL::Buffer* m_vertex_buf;
+	MTL::Buffer* m_color_buf;
 
-public:
-	ViewDelegate(MTL::Device* device) : m_device(device->retain()) {
-		m_command_queue = device->newCommandQueue();
+	static constexpr const char* shader_lib_path =
+		"/Users/claytonknittel/VSCode/g2d/build/test/libg2d_unit_testing_shaders.metallib";
+
+	void getShaders() {
+		NS::Error* err = nullptr;
+		MTL::Library* library = m_device->newLibrary(NS::String::string(shader_lib_path,
+					NS::StringEncoding::ASCIIStringEncoding), &err);
+		if (library == nullptr) {
+			printf("%s\n", err->localizedDescription()->utf8String());
+		}
+
+		MTL::Function* vertex_fn = library->newFunction(NS::String::string("rayVertex",
+					NS::UTF8StringEncoding));
+		MTL::Function* fragment_fn = library->newFunction(NS::String::string("rayFragment",
+					NS::UTF8StringEncoding));
+
+		if (vertex_fn == nullptr) {
+			printf("couldn't find rayVertex\n");
+			exit(-1);
+		}
+		if (fragment_fn == nullptr) {
+			printf("couldn't find rayFragment\n");
+			exit(-1);
+		}
+
+		MTL::RenderPipelineDescriptor* desc = MTL::RenderPipelineDescriptor::alloc()->init();
+		desc->setVertexFunction(vertex_fn);
+		desc->setFragmentFunction(fragment_fn);
+		desc->colorAttachments()->object(0)->setPixelFormat(MTL::PixelFormat::PixelFormatBGRA8Unorm_sRGB);
+
+		m_pipeline_state = m_device->newRenderPipelineState(desc, &err);
+		if (m_pipeline_state == nullptr) {
+			printf("%s", err->localizedDescription()->utf8String());
+		}
+
+		library->release();
+		desc->release();
+		fragment_fn->release();
+		vertex_fn->release();
 	}
 
-	virtual ~ViewDelegate() override {
+	void buildBuffers() {
+		const size_t NumVertices = 3;
+
+		simd::float3 positions[NumVertices] =
+		{
+			{ -0.8f,  0.8f, 0.0f },
+			{  0.0f, -0.8f, 0.0f },
+			{ +0.8f,  0.8f, 0.0f }
+		};
+
+		simd::float3 colors[NumVertices] =
+		{
+			{  1.0, 0.3f, 0.2f },
+			{  0.8f, 1.0, 0.0f },
+			{  0.8f, 0.0f, 1.0 }
+		};
+
+		m_vertex_buf = m_device->newBuffer(sizeof(positions), MTL::ResourceStorageModeManaged);
+		m_color_buf = m_device->newBuffer(sizeof(colors), MTL::ResourceStorageModeManaged);
+
+		memcpy(m_vertex_buf->contents(), positions, sizeof(positions));
+		memcpy(m_color_buf->contents(), colors, sizeof(colors));
+
+		m_vertex_buf->didModifyRange(NS::Range::Make(0, m_vertex_buf->length()));
+		m_color_buf->didModifyRange(NS::Range::Make(0, m_color_buf->length()));
+	}
+
+public:
+	Renderer(MTL::Device* device) : m_device(device)
+	{
+		m_command_queue = device->newCommandQueue();
+		getShaders();
+		buildBuffers();
+	}
+
+	~Renderer()
+	{
+		m_vertex_buf->release();
+		m_color_buf->release();
+		m_pipeline_state->release();
 		m_command_queue->release();
 		m_device->release();
 	}
 
-	virtual void drawInMTKView(MTK::View* view) override {
+	void Render(MTK::View* view) {
     	NS::AutoreleasePool* _pool = NS::AutoreleasePool::alloc()->init();
 
 		MTL::CommandBuffer* cmd_buffer = m_command_queue->commandBuffer();
@@ -26,11 +106,39 @@ public:
 		MTL::RenderCommandEncoder* encoder =
 			cmd_buffer->renderCommandEncoder(render_pass);
 
+		static uint64_t _cnt = 0;
+		uint64_t cnt = ++_cnt;
+		double val = sin((double) cnt / 100.);
+		((float*) m_color_buf->contents())[0] = (float) val;
+		m_color_buf->didModifyRange( NS::Range::Make( 0, sizeof(float) ) );
+
+		encoder->setRenderPipelineState(m_pipeline_state);
+		encoder->setVertexBuffer(m_vertex_buf, 0, 0);
+		encoder->setVertexBuffer(m_color_buf, 0, 1);
+		encoder->drawPrimitives(MTL::PrimitiveType::PrimitiveTypeTriangle, NS::UInteger(0), NS::UInteger(3));
+
 		encoder->endEncoding();
 		cmd_buffer->presentDrawable(view->currentDrawable());
 		cmd_buffer->commit();
 
 		_pool->release();
+	}
+};
+
+class ViewDelegate : public MTK::ViewDelegate
+{
+private:
+	Renderer renderer;
+
+public:
+	ViewDelegate(MTL::Device* device) : renderer(device->retain()) {
+	}
+
+	virtual ~ViewDelegate() override {
+	}
+
+	virtual void drawInMTKView(MTK::View* view) override {
+		renderer.Render(view);
 	}
 };
 
@@ -130,6 +238,7 @@ public:
 
 		m_view = MTK::View::alloc()->init(frame, m_device);
 		m_view->setClearColor(MTL::ClearColor::Make(1, 1, 0.8, 1));
+		m_view->setColorPixelFormat(MTL::PixelFormat::PixelFormatBGRA8Unorm_sRGB);
 		m_view->setDelegate(m_view_delegate);
 
 		m_window->setContentView(m_view);
