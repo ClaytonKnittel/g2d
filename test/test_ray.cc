@@ -1,5 +1,6 @@
 
 #include <simd/simd.h>
+#include <sys/stat.h>
 
 #include <g2d/metal/metal.h>
 
@@ -17,10 +18,48 @@ private:
 	static constexpr const char* shader_lib_path =
 		"/Users/claytonknittel/VSCode/g2d/build/test/libg2d_unit_testing_shaders.metallib";
 
+	void* loadFile(const char* path, size_t& file_size)
+	{
+		int fd = open(path, O_RDONLY);
+		if (fd < 0) {
+			printf("Failed to open %s\n", path);
+			return nullptr;
+		}
+		struct stat file_stat;
+		if (fstat(fd, &file_stat) != 0) {
+			printf("Failed to stat %s, reason: %s\n", path, strerror(errno));
+			close(fd);
+			return nullptr;
+		}
+
+		file_size = file_stat.st_size;
+		void* buf = malloc(file_size);
+
+		if (read(fd, buf, file_size) != (ssize_t) file_size) {
+			printf("Failed to read contents of %s\n", path);
+			free(buf);
+			close(fd);
+			return nullptr;
+		}
+
+		close(fd);
+		return buf;
+	}
+
 	void getShaders() {
 		NS::Error* err = nullptr;
-		m_library = m_device->newLibrary(NS::String::string(shader_lib_path,
-					NS::StringEncoding::ASCIIStringEncoding), &err);
+		size_t file_size;
+		void* shader_buf = loadFile(shader_lib_path, file_size);
+
+		if (shader_buf == nullptr) {
+			printf("Failed to load shader\n");
+		}
+
+		//m_library = m_device->newLibrary(NS::String::string(shader_lib_path,
+		//			NS::StringEncoding::ASCIIStringEncoding), &err);
+		dispatch_data_t data = dispatch_data_create(shader_buf, file_size,
+				nullptr, DISPATCH_DATA_DESTRUCTOR_FREE);
+		m_library = m_device->newLibrary(data, &err);
 		if (m_library == nullptr) {
 			printf("%s\n", err->localizedDescription()->utf8String());
 		}
@@ -261,6 +300,7 @@ public:
 		m_view = MTK::View::alloc()->init(frame, m_device);
 		m_view->setClearColor(MTL::ClearColor::Make(1, 1, 0.8, 1));
 		m_view->setColorPixelFormat(MTL::PixelFormat::PixelFormatBGRA8Unorm_sRGB);
+		printf("target framerate: %d\n", m_view->preferredFramesPerSecond());
 		m_view->setDelegate(m_view_delegate);
 
 		m_window->setContentView(m_view);
