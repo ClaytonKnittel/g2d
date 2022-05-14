@@ -35,7 +35,9 @@ add_custom_command(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/testing_shader_source.c"
 		${CMAKE_CURRENT_BINARY_DIR}/testing_shader_source.c
 		$<TARGET_FILE:g2d_unit_testing_shaders>
 		g_shader_source
-	DEPENDS $<TARGET_FILE:g2d_unit_testing_shaders>
+	DEPENDS
+		${CMAKE_SOURCE_DIR}/binutils/dump_file_hex.sh
+		$<TARGET_FILE:g2d_unit_testing_shaders>
 )
 
 find_library(check check REQUIRED)

@@ -19,7 +19,6 @@ private:
 	void getShaders() {
 		NS::Error* err = nullptr;
 
-		printf("source size: %zu\n", g_shader_source_size);
 		dispatch_data_t data = dispatch_data_create(g_shader_source,
 				g_shader_source_size, nullptr, ^void(void) {});
 		m_library = m_device->newLibrary(data, &err);
