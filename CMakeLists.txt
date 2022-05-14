@@ -33,7 +33,7 @@ project(g2d VERSION 0.1)
 # Options
 ############################################################
 
-set(BUILD_SHARED_LIBRARY ON CACHE BOOL "When enabled, builds libg2d as a
+set(BUILD_SHARED_LIBS ON CACHE BOOL "When enabled, builds libg2d as a
 	shared library, otherwise building as a static library")
 set(ENABLE_TESTING OFF CACHE BOOL "When enabled, build all unit tests. The
 	unit tests can then be run from within the build directory with
@@ -93,7 +93,7 @@ if(NOT USE_OPENGL)
 endif()
 
 
-if(${BUILD_SHARED_LIBRARY})
+if(${BUILD_SHARED_LIBS})
 	add_library(g2d SHARED
 		${C_SRC} ${CXX_SRC} ${ASM_SRC}
 	)
@@ -221,7 +221,7 @@ endif()
 ############################################################
 
 # Library
-if(${BUILD_SHARED_LIBRARY})
+if(${BUILD_SHARED_LIBS})
 	install(TARGETS g2d LIBRARY DESTINATION lib)
 else()
 	install(TARGETS g2d ARCHIVE DESTINATION lib)

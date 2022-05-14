@@ -1,3 +1,19 @@
+project(g2d_unit_testing_shaders)
+
+file(GLOB_RECURSE METAL_TEST_SRC
+	"${PROJECT_SOURCE_DIR}/test_*.metal"
+)
+
+add_library(g2d_unit_testing_shaders SHARED
+	${METAL_TEST_SRC}
+)
+
+set_target_properties(g2d_unit_testing_shaders PROPERTIES SUFFIX ".metallib")
+
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+enable_language(METAL)
+
+
 project(g2d_unit_testing)
 
 if("${CMAKE_SYSTEM_NAME}" MATCHES "Linux")
@@ -14,6 +30,14 @@ else()
 	set(LINUX_DISTR "")
 endif()
 
+add_custom_command(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/testing_shader_source.c"
+	COMMAND sh ${CMAKE_SOURCE_DIR}/binutils/dump_file_hex.sh
+		${CMAKE_CURRENT_BINARY_DIR}/testing_shader_source.c
+		$<TARGET_FILE:g2d_unit_testing_shaders>
+		g_shader_source
+	DEPENDS $<TARGET_FILE:g2d_unit_testing_shaders>
+)
+
 find_library(check check REQUIRED)
 
 file(GLOB_RECURSE C_TEST_SRC
@@ -22,6 +46,8 @@ file(GLOB_RECURSE C_TEST_SRC
 file(GLOB_RECURSE CXX_TEST_SRC
 	"${PROJECT_SOURCE_DIR}/test_*.cc"
 )
+
+list(APPEND C_TEST_SRC "${CMAKE_CURRENT_BINARY_DIR}/testing_shader_source.c")
 
 add_executable(g2d_unit_testing
 	${C_TEST_SRC} ${CXX_TEST_SRC}
@@ -71,20 +97,4 @@ target_include_directories(g2d_unit_testing
 	PRIVATE
 		${UTILS_DIR}/include
 )
-
-
-project(g2d_unit_testing_shaders)
-
-file(GLOB_RECURSE METAL_TEST_SRC
-	"${PROJECT_SOURCE_DIR}/test_*.metal"
-)
-
-add_library(g2d_unit_testing_shaders SHARED
-	${METAL_TEST_SRC}
-)
-
-set_target_properties(g2d_unit_testing_shaders PROPERTIES SUFFIX ".metallib")
-
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
-enable_language(METAL)
 
