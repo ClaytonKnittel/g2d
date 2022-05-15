@@ -5,16 +5,36 @@
 #include <g2d/metal/metal.h>
 #include "test_shader_source.h"
 
+namespace shader_types
+{
+    struct VertexData
+    {
+        simd::float2 position;
+        simd::float2 texcoord;
+    };
+
+    struct InstanceData
+    {
+        simd::float3x3 instanceTransform;
+    };
+}
+
 class Renderer
 {
 private:
+	static constexpr const uint32_t MAX_FRAMES_IN_FLIGHT = 3;
+	static constexpr const uint32_t NUM_INSTANCES = 32;
+
 	MTL::Device* m_device;
 	MTL::CommandQueue* m_command_queue;
 	MTL::RenderPipelineState* m_pipeline_state;
 	MTL::Library* m_library;
+	MTL::Texture* m_texture;
 	MTL::Buffer* m_vertex_buf;
-	MTL::Buffer* m_color_buf;
-	MTL::Buffer* m_arg_buf;
+	MTL::Buffer* m_v_index_buf;
+	MTL::Buffer* m_instance_buf[MAX_FRAMES_IN_FLIGHT];
+	//MTL::Buffer* m_arg_buf;
+	uint64_t m_frame_idx;
 
 	void getShaders() {
 		NS::Error* err = nullptr;
@@ -55,33 +75,77 @@ private:
 		vertex_fn->release();
 	}
 
+	void buildTextures()
+	{
+		const uint32_t tw = 128;
+		const uint32_t th = 128;
+
+		MTL::TextureDescriptor* texture_desc = MTL::TextureDescriptor::alloc()->init();
+		texture_desc->setWidth(tw);
+		texture_desc->setHeight(th);
+		texture_desc->setPixelFormat(MTL::PixelFormatRGBA8Unorm);
+		texture_desc->setTextureType(MTL::TextureType2D);
+		texture_desc->setStorageMode(MTL::StorageModeManaged);
+		texture_desc->setUsage(MTL::ResourceUsageSample | MTL::ResourceUsageRead);
+
+		m_texture = m_device->newTexture(texture_desc);
+		texture_desc->release();
+
+		uint8_t* texture_data = (uint8_t*) malloc(tw * th * 4);
+		for (uint64_t y = 0; y < th; y++) {
+			for (uint64_t x = 0; x < tw; x++) {
+				float dx = 2 * ((float) x - (float) tw / 2.f) / tw;
+				float dy = 2 * ((float) y - (float) th / 2.f) / th;
+
+				float dc = tanhf(dx * dx + dy * dy);
+				uint8_t dc_norm = (uint8_t) (dc * 0xff);
+
+				texture_data[4 * (x + tw * y) + 0] = 0x30;
+				texture_data[4 * (x + tw * y) + 1] = dc_norm;
+				texture_data[4 * (x + tw * y) + 2] = 1 - dc_norm;
+				texture_data[4 * (x + tw * y) + 3] = 0xff;
+			}
+		}
+
+		m_texture->replaceRegion(MTL::Region(0, 0, 0, tw, th, 1), 0, texture_data, tw * 4);
+
+		free(texture_data);
+	}
+
 	void buildBuffers() {
-		const size_t NumVertices = 3;
+		const float s = 0.5f;
 
-		simd::float3 positions[NumVertices] =
+		shader_types::VertexData verts[] =
 		{
-			{ -0.8f,  0.8f, 0.0f },
-			{  0.0f, -0.8f, 0.0f },
-			{ +0.8f,  0.8f, 0.0f }
+			// Positions   Tex Coords
+			{ { -s, -s }, { 0.f, 0.f } },
+			{ { +s, -s }, { 1.f, 0.f } },
+			{ { +s, +s }, { 1.f, 1.f } },
+			{ { -s, +s }, { 0.f, 1.f } }
 		};
 
-		simd::float3 colors[NumVertices] =
-		{
-			{  1.0, 0.3f, 0.2f },
-			{  0.8f, 1.0, 0.0f },
-			{  0.8f, 0.0f, 1.0 }
+		uint16_t v_index[] = {
+			0, 1, 2,
+			2, 3, 0
 		};
 
-		m_vertex_buf = m_device->newBuffer(sizeof(positions), MTL::ResourceStorageModeManaged);
-		m_color_buf = m_device->newBuffer(sizeof(colors), MTL::ResourceStorageModeManaged);
+		m_vertex_buf = m_device->newBuffer(sizeof(verts), MTL::ResourceStorageModeManaged);
+		m_v_index_buf = m_device->newBuffer(sizeof(v_index), MTL::ResourceStorageModeManaged);
 
-		memcpy(m_vertex_buf->contents(), positions, sizeof(positions));
-		memcpy(m_color_buf->contents(), colors, sizeof(colors));
+		memcpy(m_vertex_buf->contents(), verts, sizeof(verts));
+		memcpy(m_v_index_buf->contents(), v_index, sizeof(v_index));
 
 		m_vertex_buf->didModifyRange(NS::Range::Make(0, m_vertex_buf->length()));
-		m_color_buf->didModifyRange(NS::Range::Make(0, m_color_buf->length()));
+		m_v_index_buf->didModifyRange(NS::Range::Make(0, m_v_index_buf->length()));
 
-		MTL::Function* vertex_fn = m_library->newFunction(NS::String::string("rayVertex",
+		const size_t instance_buf_len = NUM_INSTANCES * sizeof(shader_types::InstanceData);
+
+		for (uint32_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
+			m_instance_buf[i] = m_device->newBuffer(instance_buf_len,
+					MTL::ResourceStorageModeManaged);
+		}
+
+		/*MTL::Function* vertex_fn = m_library->newFunction(NS::String::string("rayVertex",
 					NS::UTF8StringEncoding));
 		MTL::ArgumentEncoder* arg_encoder = vertex_fn->newArgumentEncoder(0);
 		m_arg_buf = m_device->newBuffer(arg_encoder->encodedLength(), MTL::ResourceStorageModeManaged);
@@ -92,27 +156,32 @@ private:
 
 		arg_encoder->setArgumentBuffer(m_arg_buf, 0);
 		arg_encoder->setBuffer(m_vertex_buf, 0, 0);
-		arg_encoder->setBuffer(m_color_buf, 0, 1);
+		arg_encoder->setBuffer(m_v_index_buf, 0, 1);
 
 		m_arg_buf->didModifyRange(NS::Range::Make(0, m_arg_buf->length()));
 
 		arg_encoder->release();
-		vertex_fn->release();
+		vertex_fn->release();*/
 	}
 
 public:
-	Renderer(MTL::Device* device) : m_device(device)
+	Renderer(MTL::Device* device) : m_device(device), m_frame_idx(0)
 	{
 		m_command_queue = device->newCommandQueue();
 		getShaders();
+		buildTextures();
 		buildBuffers();
 	}
 
 	~Renderer()
 	{
-		m_arg_buf->release();
+		//m_arg_buf->release();
 		m_vertex_buf->release();
-		m_color_buf->release();
+		m_v_index_buf->release();
+		for (uint32_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
+			m_instance_buf[i]->release();
+		}
+		m_texture->release();
 		m_library->release();
 		m_pipeline_state->release();
 		m_command_queue->release();
@@ -128,17 +197,47 @@ public:
 		MTL::RenderCommandEncoder* encoder =
 			cmd_buffer->renderCommandEncoder(render_pass);
 
-		/*static uint64_t _cnt = 0;
-		uint64_t cnt = ++_cnt;
-		double val = sin((double) cnt / 100.);
-		((float*) m_color_buf->contents())[0] = (float) val;
-		m_color_buf->didModifyRange( NS::Range::Make( 0, sizeof(float) ) );*/
+		uint64_t frame = m_frame_idx++;
+		MTL::Buffer* instance_buf_ptr = m_instance_buf[frame % MAX_FRAMES_IN_FLIGHT];
+
+		const float scl = 2.f / NUM_INSTANCES;
+		shader_types::InstanceData* instance_buf =
+			reinterpret_cast<shader_types::InstanceData*>(instance_buf_ptr->contents());
+		for (uint64_t i = 0; i < NUM_INSTANCES; i++) {
+			float angle = 4 * (float) i / (float) NUM_INSTANCES * 2.f * M_PI + (float) frame / 11.3f;
+			float frac = (float) i / (float) NUM_INSTANCES;
+			float x = (frac * 2.f - 1.f) + (1.f / (float) NUM_INSTANCES);
+			float y = sinf((frac + (float) frame / 200.f) * 2.f * M_PI);
+
+			instance_buf[i].instanceTransform = (simd::float3x3) {
+				(simd::float3) { scl * sinf(angle),  scl * cosf(angle), 0.f },
+				(simd::float3) { scl * cosf(angle), -scl * sinf(angle), 0.f },
+				(simd::float3) { x,                  y,                 1.f },
+			};
+		}
+		instance_buf_ptr->didModifyRange(NS::Range::Make(0, instance_buf_ptr->length()));
 
 		encoder->setRenderPipelineState(m_pipeline_state);
-		encoder->setVertexBuffer(m_arg_buf, 0, 0);
-		encoder->useResource(m_vertex_buf, MTL::ResourceUsageRead);
-		encoder->useResource(m_color_buf, MTL::ResourceUsageRead);
-		encoder->drawPrimitives(MTL::PrimitiveType::PrimitiveTypeTriangle, NS::UInteger(0), NS::UInteger(3));
+		encoder->setVertexBuffer(m_vertex_buf, 0, 0);
+		encoder->setVertexBuffer(instance_buf_ptr, 0, 1);
+		encoder->setFragmentTexture(m_texture, 0);
+		//encoder->setVertexBuffer(m_arg_buf, 0, 0);
+		//encoder->useResource(m_vertex_buf, MTL::ResourceUsageRead);
+		//encoder->useResource(m_color_buf, MTL::ResourceUsageRead);
+
+		//
+		// void drawIndexedPrimitives( PrimitiveType primitiveType,
+		//                             NS::UInteger indexCount,
+		//                             IndexType indexType,
+		//                             const class Buffer* pIndexBuffer,
+		//                             NS::UInteger indexBufferOffset,
+		//                             NS::UInteger instanceCount );
+		encoder->drawIndexedPrimitives(MTL::PrimitiveType::PrimitiveTypeTriangle,
+				NS::UInteger(6),
+				MTL::IndexType::IndexTypeUInt16,
+				m_v_index_buf,
+				NS::UInteger(0),
+				NS::UInteger(NUM_INSTANCES));
 
 		encoder->endEncoding();
 		cmd_buffer->presentDrawable(view->currentDrawable());
@@ -263,6 +362,8 @@ public:
 		m_view->setClearColor(MTL::ClearColor::Make(1, 1, 0.8, 1));
 		m_view->setColorPixelFormat(MTL::PixelFormat::PixelFormatBGRA8Unorm_sRGB);
 		printf("target framerate: %d\n", m_view->preferredFramesPerSecond());
+		//m_view->setPreferredFramesPerSecond(30);
+		//printf("target framerate: %d\n", m_view->preferredFramesPerSecond());
 		m_view->setDelegate(m_view_delegate);
 
 		m_window->setContentView(m_view);
