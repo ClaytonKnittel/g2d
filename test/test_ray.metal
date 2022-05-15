@@ -33,7 +33,7 @@ v2f vertex rayVertex(device const VertexData* vertexData [[buffer(0)]],
 
 half4 fragment rayFragment(v2f in [[stage_in]], texture2d<half, access::sample> tex [[texture(0)]])
 {
-	constexpr sampler s(address::repeat, filter::linear);
+	constexpr sampler s(address::clamp_to_edge, filter::nearest);
 	half3 texel = tex.sample(s, in.tex_coord).rgb;
 	return half4(texel, 1.0);
 }

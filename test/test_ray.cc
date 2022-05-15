@@ -77,8 +77,8 @@ private:
 
 	void buildTextures()
 	{
-		const uint32_t tw = 128;
-		const uint32_t th = 128;
+		const uint32_t tw = 9;
+		const uint32_t th = 9;
 
 		MTL::TextureDescriptor* texture_desc = MTL::TextureDescriptor::alloc()->init();
 		texture_desc->setWidth(tw);
@@ -94,8 +94,8 @@ private:
 		uint8_t* texture_data = (uint8_t*) malloc(tw * th * 4);
 		for (uint64_t y = 0; y < th; y++) {
 			for (uint64_t x = 0; x < tw; x++) {
-				float dx = 2 * ((float) x - (float) tw / 2.f) / tw;
-				float dy = 2 * ((float) y - (float) th / 2.f) / th;
+				float dx = 2 * ((float) x - (float) (tw - 1) / 2.f) / (tw - 1);
+				float dy = 2 * ((float) y - (float) (th - 1) / 2.f) / (th - 1);
 
 				float dc = tanhf(dx * dx + dy * dy);
 				uint8_t dc_norm = (uint8_t) (dc * 0xff);
@@ -107,7 +107,7 @@ private:
 			}
 		}
 
-		m_texture->replaceRegion(MTL::Region(0, 0, 0, tw, th, 1), 0, texture_data, tw * 4);
+		m_texture->replaceRegion(MTL::Region(0, 0, tw, th), 0, texture_data, tw * 4);
 
 		free(texture_data);
 	}
