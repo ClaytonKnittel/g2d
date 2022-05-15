@@ -31,12 +31,12 @@ else()
 endif()
 
 add_custom_command(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/testing_shader_source.c"
-	COMMAND sh ${CMAKE_SOURCE_DIR}/binutils/dump_file_hex.sh
+	COMMAND sh ${CMAKE_SOURCE_DIR}/binutils/generate_file_contents_array_source.sh
 		${CMAKE_CURRENT_BINARY_DIR}/testing_shader_source.c
 		$<TARGET_FILE:g2d_unit_testing_shaders>
 		g_shader_source
 	DEPENDS
-		${CMAKE_SOURCE_DIR}/binutils/dump_file_hex.sh
+		${CMAKE_SOURCE_DIR}/binutils/generate_file_contents_array_source.sh
 		$<TARGET_FILE:g2d_unit_testing_shaders>
 )
 

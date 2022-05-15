@@ -158,15 +158,20 @@ endif()
 
 if(USE_METAL)
 	target_compile_definitions(g2d PUBLIC USE_METAL)
+
+	target_include_directories(g2d
+		PUBLIC
+			${PROJECT_SOURCE_DIR}/modules/metal-cpp
+			${PROJECT_SOURCE_DIR}/modules/metal-cpp-extensions
+	)
 elseif(USE_OPENGL)
 	target_compile_definitions(g2d PUBLIC USE_OPENGL)
+
+	find_library(glfw glfw REQUIRED)
+	find_package(OpenGL REQUIRED)
+	find_package(GLEW REQUIRED)
 endif()
 
-add_subdirectory(modules/utils)
-
-find_library(glfw glfw REQUIRED)
-find_package(OpenGL REQUIRED)
-find_package(GLEW REQUIRED)
 find_package(Freetype MODULE REQUIRED)
 
 target_include_directories(g2d
@@ -175,8 +180,6 @@ target_include_directories(g2d
 		"/usr/local/include"
 	PUBLIC
 		$<$<NOT:$<COMPILE_LANGUAGE:ASM>>:${PROJECT_SOURCE_DIR}/include>
-		${PROJECT_SOURCE_DIR}/modules/metal-cpp
-		${PROJECT_SOURCE_DIR}/modules/metal-cpp-extensions
 )
 
 target_link_libraries(g2d
@@ -240,4 +243,11 @@ add_custom_command(
     COMMAND xargs rm -vf < install_manifest.txt || echo Nothing in
             install_manifest.txt to be uninstalled!
 )
+
+
+############################################################
+# Submodule Dependencies
+############################################################
+
+add_subdirectory(modules/utils)
 
