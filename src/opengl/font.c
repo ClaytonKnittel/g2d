@@ -7,6 +7,8 @@
 #include <g2d/opengl/color.h>
 #include <g2d/opengl/font.h>
 
+#include <utils/utils.h>
+
 
 // number of floats sent to GPU per vertex being drawn
 #define DATA_PER_VERT 4

@@ -229,6 +229,7 @@ target_link_libraries(g2d
 		${FREETYPE_LIBRARIES}
 	PUBLIC
 		"${LINK_LIBS}"
+		utils
 )
 
 if(USE_METAL)
