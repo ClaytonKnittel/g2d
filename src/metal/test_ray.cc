@@ -24,7 +24,7 @@ class Renderer
 {
 private:
 	static constexpr const uint32_t MAX_FRAMES_IN_FLIGHT = 3;
-	static constexpr const uint32_t NUM_INSTANCES = 32;
+	static constexpr const uint32_t NUM_INSTANCES = 3;
 
 	MTL::Device* m_device;
 	MTL::CommandQueue* m_command_queue;
@@ -78,8 +78,8 @@ private:
 
 	void buildTextures()
 	{
-		const uint32_t tw = 9;
-		const uint32_t th = 9;
+		const uint64_t tw = 9;
+		const uint64_t th = 9;
 
 		MTL::TextureDescriptor* texture_desc = MTL::TextureDescriptor::alloc()->init();
 		texture_desc->setWidth(tw);
@@ -197,6 +197,12 @@ public:
 			view->currentRenderPassDescriptor();
 		MTL::RenderCommandEncoder* encoder =
 			cmd_buffer->renderCommandEncoder(render_pass);
+		cmd_buffer->addCompletedHandler( ^void(MTL::CommandBuffer* cmd_buf) {
+				static int cnt = 0;
+				if (cnt++ % 60 == 0) {
+					printf("%f\n", cmd_buf->GPUEndTime() - cmd_buf->GPUStartTime());
+				}
+			});
 
 		uint64_t frame = m_frame_idx++;
 		MTL::Buffer* instance_buf_ptr = m_instance_buf[frame % MAX_FRAMES_IN_FLIGHT];
@@ -341,8 +347,21 @@ public:
 	}
 
 	virtual void applicationDidFinishLaunching( NS::Notification* notification ) override {
+		NS::Array* devs = MTL::CopyAllDevices();
 
-		m_device = MTL::CreateSystemDefaultDevice();
+		printf("%ld devices total\n", devs->count());
+		for (uint64_t i = 0; i < devs->count(); i++) {
+			MTL::Device* device = static_cast<MTL::Device*>(devs->object(i));
+			//printf("Got device %s\n", device->name()->cString(NS::UTF8StringEncoding));
+
+			if (i == 1) {
+				m_device = device->retain();
+			}
+		}
+		devs->release();
+
+		//m_device = MTL::CreateSystemDefaultDevice();
+		printf("dev: %s\n", m_device->name()->cString(NS::UTF8StringEncoding));
 
 		if (m_device == nullptr) {
 			fprintf(stderr, "Failed to find device\n");
