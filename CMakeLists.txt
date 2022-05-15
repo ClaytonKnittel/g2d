@@ -21,9 +21,12 @@ else()
 	set(LINUX_DISTR "")
 endif()
 
+# add the cmake directory to the cmake module path
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+
 
 ############################################################
-# Utils Library
+# g2d Library
 ############################################################
 
 project(g2d VERSION 0.1)
@@ -61,6 +64,28 @@ endif()
 
 
 ############################################################
+# g2d Metal Shaders Library
+############################################################
+
+if(USE_METAL)
+
+project(g2d_metal_shaders)
+
+file(GLOB_RECURSE METAL_TEST_SRC
+	"${PROJECT_SOURCE_DIR}/src/*.metal"
+)
+
+add_library(g2d_metal_shaders SHARED
+	${METAL_TEST_SRC}
+)
+
+set_target_properties(g2d_metal_shaders PROPERTIES SUFFIX ".metallib")
+enable_language(METAL)
+
+endif()
+
+
+############################################################
 # Build Rules
 ############################################################
 
@@ -73,6 +98,20 @@ file(GLOB_RECURSE CXX_SRC
 file(GLOB_RECURSE ASM_SRC
 	"${PROJECT_SOURCE_DIR}/src/*.s"
 )
+
+if(USE_METAL)
+	add_custom_command(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/metal_shader_lib_source.c"
+		COMMAND sh ${PROJECT_SOURCE_DIR}/binutils/generate_file_contents_array_source.sh
+			${CMAKE_CURRENT_BINARY_DIR}/metal_shader_lib_source.c
+			$<TARGET_FILE:g2d_metal_shaders>
+			g_metal_shader_lib_source
+		DEPENDS
+			${PROJECT_SOURCE_DIR}/binutils/generate_file_contents_array_source.sh
+			$<TARGET_FILE:g2d_metal_shaders>
+	)
+
+	list(APPEND C_SRC "${CMAKE_CURRENT_BINARY_DIR}/metal_shader_lib_source.c")
+endif()
 
 # remove arch_test dir
 list(FILTER C_SRC EXCLUDE REGEX "^${PROJECT_SOURCE_DIR}/src/arch_test/*")
@@ -160,7 +199,7 @@ if(USE_METAL)
 	target_compile_definitions(g2d PUBLIC USE_METAL)
 
 	target_include_directories(g2d
-		PUBLIC
+		PRIVATE
 			${PROJECT_SOURCE_DIR}/modules/metal-cpp
 			${PROJECT_SOURCE_DIR}/modules/metal-cpp-extensions
 	)
@@ -192,7 +231,10 @@ target_link_libraries(g2d
 if(USE_METAL)
 	target_link_libraries(g2d
 		PUBLIC
-			"-framework Foundation" "-framework QuartzCore" "-framework Metal -framework MetalKit"
+			"-framework Foundation"
+			"-framework QuartzCore"
+			"-framework Metal"
+			"-framework MetalKit"
 	)
 elseif(USE_OPENGL)
 	target_link_libraries(g2d

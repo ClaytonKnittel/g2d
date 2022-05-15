@@ -2,8 +2,9 @@
 #include <simd/simd.h>
 #include <sys/stat.h>
 
+#include <g2d/g2d.h>
 #include <g2d/metal/metal.h>
-#include "test_shader_source.h"
+#include <g2d/metal/metal_shader_lib_source.h>
 
 namespace shader_types
 {
@@ -39,8 +40,8 @@ private:
 	void getShaders() {
 		NS::Error* err = nullptr;
 
-		dispatch_data_t data = dispatch_data_create(g_shader_source,
-				g_shader_source_size, nullptr, ^void(void) {});
+		dispatch_data_t data = dispatch_data_create(g_metal_shader_lib_source,
+				g_metal_shader_lib_source_size, nullptr, ^void(void) {});
 		m_library = m_device->newLibrary(data, &err);
 		if (m_library == nullptr) {
 			printf("%s\n", err->localizedDescription()->utf8String());
@@ -361,9 +362,6 @@ public:
 		m_view = MTK::View::alloc()->init(frame, m_device);
 		m_view->setClearColor(MTL::ClearColor::Make(1, 1, 0.8, 1));
 		m_view->setColorPixelFormat(MTL::PixelFormat::PixelFormatBGRA8Unorm_sRGB);
-		printf("target framerate: %d\n", m_view->preferredFramesPerSecond());
-		//m_view->setPreferredFramesPerSecond(30);
-		//printf("target framerate: %d\n", m_view->preferredFramesPerSecond());
 		m_view->setDelegate(m_view_delegate);
 
 		m_window->setContentView(m_view);
@@ -380,7 +378,7 @@ public:
 };
 
 int
-main()
+call_test_ray()
 {
 	NS::AutoreleasePool* pool = NS::AutoreleasePool::alloc()->init();
 
