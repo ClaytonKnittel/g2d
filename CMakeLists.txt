@@ -164,7 +164,8 @@ target_compile_options(g2d
 	PUBLIC
 		$<$<COMPILE_LANGUAGE:CXX>:-Wno-nested-anon-types -Wno-ignored-qualifiers
 		-Wno-gnu-anonymous-struct -Wno-unused-parameter -Wno-newline-eof
-		-Wno-c++11-extensions -Wno-c++14-extensions -Wno-c++17-extensions>
+		-Wno-c++11-extensions -Wno-c++14-extensions -Wno-c++17-extensions
+		-Wno-gnu-zero-variadic-macro-arguments>
 )
 
 if("${CMAKE_ASM_COMPILER_ID}" MATCHES "GNU")
@@ -182,7 +183,9 @@ if (${ENABLE_TESTING})
 endif()
 
 if("${CMAKE_BUILD_TYPE}" MATCHES "Debug" OR "${CMAKE_BUILD_TYPE}" MATCHES "RelWithDebInfo")
-	target_compile_definitions(g2d PRIVATE DEBUG)
+	target_compile_definitions(g2d PRIVATE DEBUG_BUILD)
+elseif("${CMAKE_BUILD_TYPE}" MATCHES "Release")
+	target_compile_definitions(g2d PRIVATE RELEASE_BUILD)
 endif()
 
 include(CheckCXXCompilerFlag)

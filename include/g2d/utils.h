@@ -1,53 +1,14 @@
-#ifndef _GLIB_UTIL_H
-#define _GLIB_UTIL_H
-
-#define GLEW_STATIC
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
+#ifndef _G2D_UTIL_H
+#define _G2D_UTIL_H
 
 #include <stdint.h>
 #include <stdio.h>
 
+#ifdef USE_OPENGL
 
-#ifdef BUILD
-
-// when in production build mode, change prints to syslogs
-
-#include <syslog.h>
-
-#define fprintf(file, ...) syslog(LOG_ALERT, __VA_ARGS__)
-#define printf(...) syslog(LOG_ALERT, __VA_ARGS__)
-
-#endif /* BUILD */
-
-
-// reinterpret cast of int to float (keep bits same)
-static float int_to_float(uint32_t i) {
-    union {
-        uint32_t ival;
-        float fval;
-    } __v = {
-        .ival = i
-    };
-    return __v.fval;
-}
-
-
-#define MIN(a, b) ((a) < (b) ? (a) : (b))
-#define MAX(a, b) ((a) > (b) ? (a) : (b))
-
-// align must be power of two
-#define ALIGN_UP(a, align) \
-    (((a) + ((align) - 1)) & ~((align) - 1))
-
-
-// rounds up a to nearest multiple of mod
-#define ROUND_UP(a, mod) \
-    ((((a) + ((mod) - 1)) / (mod)) * (mod))
-
-#define ROUND_DOWN(a, mod) \
-    (((a) / (mod)) * (mod))
-
+#define GLEW_STATIC
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
 
 static GLenum glCheckError_(const char *file, int line)
 {
@@ -72,5 +33,6 @@ static GLenum glCheckError_(const char *file, int line)
 }
 #define glCheckError() glCheckError_(__FILE__, __LINE__)
 
+#endif /* USE_OPENGL */
 
-#endif /* _GLIB_UTIL_H */
+#endif /* _G2D_UTIL_H */
