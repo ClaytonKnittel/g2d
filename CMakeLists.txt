@@ -47,8 +47,10 @@ set(ENABLE_TESTING OFF CACHE BOOL "When enabled, build all unit tests. The
 # Parameters
 ############################################################
 
-set(METAL_PLATFORMS Darwin)
-set(OPENGL_PLATFORMS Linux)
+#set(METAL_PLATFORMS Darwin)
+#set(OPENGL_PLATFORMS Linux)
+set(METAL_PLATFORMS)
+set(OPENGL_PLATFORMS Darwin Linux)
 
 # check for graphics library support
 set(USE_METAL OFF)
@@ -58,6 +60,21 @@ if(CMAKE_SYSTEM_NAME IN_LIST METAL_PLATFORMS)
 	set(USE_METAL ON)
 elseif(CMAKE_SYSTEM_NAME IN_LIST OPENGL_PLATFORMS)
 	set(USE_OPENGL ON)
+else()
+	message(SEND_ERROR "System not supported: ${CMAKE_SYSTEM_NAME}")
+endif()
+
+set(AUDIO_TOOLBOX_PLATFORMS)
+set(OPENAL_PLATFORMS Darwin Linux)
+
+# check for graphics library support
+set(USE_AUDIO_TOOLBOX OFF)
+set(USE_OPENAL OFF)
+
+if(CMAKE_SYSTEM_NAME IN_LIST AUDIO_TOOLBOX_PLATFORMS)
+	set(USE_AUDIO_TOOLBOX ON)
+elseif(CMAKE_SYSTEM_NAME IN_LIST OPENAL_PLATFORMS)
+	set(USE_OPENAL ON)
 else()
 	message(SEND_ERROR "System not supported: ${CMAKE_SYSTEM_NAME}")
 endif()
@@ -129,6 +146,19 @@ if(NOT USE_OPENGL)
 	list(FILTER C_SRC EXCLUDE REGEX "^${PROJECT_SOURCE_DIR}/src/opengl/*")
 	list(FILTER CXX_SRC EXCLUDE REGEX "^${PROJECT_SOURCE_DIR}/src/opengl/*")
 	list(FILTER ASM_SRC EXCLUDE REGEX "^${PROJECT_SOURCE_DIR}/src/opengl/*")
+endif()
+
+# remove openal/AudioToolbox specific directories if not in use
+if(NOT USE_AUDIO_TOOLBOX)
+	list(FILTER C_SRC EXCLUDE REGEX "^${PROJECT_SOURCE_DIR}/src/audio_toolbox/*")
+	list(FILTER CXX_SRC EXCLUDE REGEX "^${PROJECT_SOURCE_DIR}/src/audio_toolbox/*")
+	list(FILTER ASM_SRC EXCLUDE REGEX "^${PROJECT_SOURCE_DIR}/src/audio_toolbox/*")
+endif()
+
+if(NOT USE_OPENGL)
+	list(FILTER C_SRC EXCLUDE REGEX "^${PROJECT_SOURCE_DIR}/src/openal/*")
+	list(FILTER CXX_SRC EXCLUDE REGEX "^${PROJECT_SOURCE_DIR}/src/openal/*")
+	list(FILTER ASM_SRC EXCLUDE REGEX "^${PROJECT_SOURCE_DIR}/src/openal/*")
 endif()
 
 
@@ -214,6 +244,15 @@ elseif(USE_OPENGL)
 	find_package(GLEW REQUIRED)
 endif()
 
+if(USE_AUDIO_TOOLBOX)
+	target_compile_definitions(g2d PUBLIC USE_AUDIO_TOOLBOX)
+	message(SEND_ERROR "Not yet implemented")
+elseif(USE_OPENAL)
+	target_compile_definitions(g2d PUBLIC USE_OPENAL)
+
+	find_package(OpenAL MODULE REQUIRED)
+endif()
+
 find_package(Freetype MODULE REQUIRED)
 
 target_include_directories(g2d
@@ -244,6 +283,24 @@ elseif(USE_OPENGL)
 	target_link_libraries(g2d
 		PRIVATE
 			glfw GLEW ${OPENGL_LIBRARIES}
+	)
+endif()
+
+if(USE_AUDIO_TOOLBOX)
+	target_link_libraries(g2d
+		PUBLIC
+			"-framework Foundation"
+			"-framework AudioToolbox"
+	)
+elseif(USE_OPENAL)
+	target_include_directories(g2d
+		PRIVATE
+			${OPENAL_INCLUDE_DIR}
+	)
+
+	target_link_libraries(g2d
+		PRIVATE
+			${OPENAL_LIBRARY}
 	)
 endif()
 

@@ -5,9 +5,6 @@
 extern "C" {
 #endif /* __cplusplus */
 
-#ifdef USE_METAL
-int call_test_ray();
-#endif
 
 #ifdef __cplusplus
 }
