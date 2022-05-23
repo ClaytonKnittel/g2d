@@ -99,7 +99,10 @@ check_err(ALCdevice* device)
 		case ALC_OUT_OF_MEMORY:
 			printf("ALC_OUT_OF_MEMORY: an unknown enum value was passed to an OpenAL function\n");
 			break;
+		case ALC_NO_ERROR:
+			break;
 		default:
+			printf("UNKNOWN ALC ERROR\n");
 			break;
 	}
 }
@@ -121,7 +124,21 @@ al_test()
 	ALCdevice* device = alcOpenDevice(NULL);
 	check_err(device);
 
+	ALCint attrs_size = 0;
+	alcGetIntegerv(device, ALC_ATTRIBUTES_SIZE, 1, &attrs_size);
+	printf("%d attrs\n", attrs_size);
+	check_err(device);
+
+	ALCint* attrs = (ALCint*) malloc(attrs_size * sizeof(ALCint));
+	alcGetIntegerv(device, ALC_ALL_ATTRIBUTES, attrs_size, attrs);
+	check_err(device);
+	for (uint32_t i = 0; i < attrs_size / 2u; i++) {
+		printf("%d -> %d\n", attrs[2 * i], attrs[2 * i + 1]);
+	}
+	free(attrs);
+
 	ALCcontext* context = alcCreateContext(device, NULL);
+	check_err(device);
 
 	if (!alcMakeContextCurrent(context)) {
 		printf("Failed to make context current\n");
