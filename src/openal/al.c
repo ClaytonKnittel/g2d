@@ -126,16 +126,19 @@ al_test()
 
 	ALCint attrs_size = 0;
 	alcGetIntegerv(device, ALC_ATTRIBUTES_SIZE, 1, &attrs_size);
-	printf("%d attrs\n", attrs_size);
 	check_err(device);
 
-	ALCint* attrs = (ALCint*) malloc(attrs_size * sizeof(ALCint));
-	alcGetIntegerv(device, ALC_ALL_ATTRIBUTES, attrs_size, attrs);
-	check_err(device);
-	for (uint32_t i = 0; i < attrs_size / 2u; i++) {
-		printf("%d -> %d\n", attrs[2 * i], attrs[2 * i + 1]);
+	if (attrs_size > 0) {
+		ALCint* attrs = (ALCint*) malloc(attrs_size * sizeof(ALCint));
+		alcGetIntegerv(device, ALC_ALL_ATTRIBUTES, attrs_size, attrs);
+		check_err(device);
+		for (uint32_t i = 0; i < (attrs_size - 1) / 2u; i++) {
+			if (attrs[2 * i] == ALC_FREQUENCY) {
+				printf("Frequency: %u\n", attrs[2 * i + 1]);
+			}
+			free(attrs);
+		}
 	}
-	free(attrs);
 
 	ALCcontext* context = alcCreateContext(device, NULL);
 	check_err(device);
