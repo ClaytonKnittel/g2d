@@ -23,6 +23,24 @@
 #define FREQUENCY 48000lu
 #define ENV_PCT 20
 
+static double
+waveform(double t, double f)
+{
+	/*double res = 0;
+	for (uint64_t i = 1; i < 24; i++) {
+		res += 1. / i * sin(2 * M_PI * t * f * i);
+		res += -1. / (i + 1) * sin(2 * M_PI * (t * f + .25) * i);
+	}
+	return .38 + res / 2;*/
+	double res = 0;
+	for (uint64_t i = 1; i < 60; i++) {
+		uint64_t newi = 2 * i - 1;
+		res += (i % 2 == 1 ? -1. : 1) / (newi * newi) * sin(2 * M_PI * t * f * newi);
+		//res += -1. / (i + 1) * sin(2 * M_PI * (t * f + .25) * i);
+	}
+	return res * 3 / 4;
+}
+
 static int16_t*
 gen_buf()
 {
@@ -54,10 +72,12 @@ gen_buf()
 			}
 		}
 
-		int16_t val = 0 + 8192 * env * sin(t * 2 * 3.14159 * 440);
-		int16_t val2 = 0 + 8192 * env * sin(t * 2 * 3.14159 * 733.333);
-		int16_t val3 = 0 + 8192 * env * sin(t * 2 * 3.14159 * 968);
-		int16_t val4 = 0 + 8192 * env * sin(t * 2 * 3.14159 * 550);
+#define SCALE 16000
+#define BASE_FREQ 30.
+		int16_t val = 0 + SCALE * env * waveform(t, BASE_FREQ);
+		int16_t val2 = val;//0 + SCALE * env * waveform(t, 5 * BASE_FREQ / 3);
+		int16_t val3 = 0;//0 + SCALE * env * waveform(t, 11 * BASE_FREQ / 5);
+		int16_t val4 = 0;//0 + SCALE * env * waveform(t, 5 * BASE_FREQ / 4);
 
 		buf[2 * i + 0] = val + val3;
 		buf[2 * i + 1] = val2 + val4;
