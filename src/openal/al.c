@@ -19,29 +19,39 @@
 #include "al.h"
 #include "alc.h"
 
+#define DURATION 5
 #define FREQUENCY 48000lu
+#define ENV_PCT 20
 
 static int16_t*
 gen_buf()
 {
-	int16_t* buf = (int16_t*) malloc(FREQUENCY * 2 * sizeof(uint16_t));
+	int16_t* buf = (int16_t*) malloc(DURATION * FREQUENCY * 2 * sizeof(uint16_t));
 
-	for (uint64_t i = 0; i < FREQUENCY; i++) {
-		float env = (i < FREQUENCY / 10) ? (float) i / (FREQUENCY / 10) :
-			(i > 9 * FREQUENCY / 10) ? (float) (FREQUENCY - i) / (FREQUENCY / 10) :
+	for (uint64_t i = 0; i < DURATION * FREQUENCY; i++) {
+		float env = (i < DURATION * FREQUENCY / ENV_PCT) ? (float) i / (DURATION * FREQUENCY / ENV_PCT) :
+			(i > (ENV_PCT - 1) * DURATION * FREQUENCY / ENV_PCT) ? (float) (DURATION * FREQUENCY - i) / (DURATION * FREQUENCY / ENV_PCT) :
 			1.f;
 
 		double t;
-		if (i < FREQUENCY / 3) {
+		if (i < DURATION * FREQUENCY / 3) {
 			t = (double) i / FREQUENCY;
 		}
-		else if (i < 2 * FREQUENCY / 3) {
-			uint64_t newi = i - FREQUENCY / 3;
-			t = (double) i / FREQUENCY + ((double) newi * newi * 3 / (4 * FREQUENCY * FREQUENCY));
+		else if (i < 2 * DURATION * FREQUENCY / 3) {
+			uint64_t newi = i - DURATION * FREQUENCY / 3;
+			t = (double) i / FREQUENCY + ((double) newi * newi * 3 / (4 * DURATION * FREQUENCY * FREQUENCY));
+
+			if (i == 2 * DURATION * FREQUENCY / 3 - 1) {
+				printf("%g\n", t);
+			}
 		}
 		else {
-			double offset = -1 / 4.0;
+			double offset = -DURATION / 4.0;
 			t = (double) i * 3 / (2 * FREQUENCY) + offset;
+
+			if (i == 2 * DURATION * FREQUENCY / 3) {
+				printf("%g\n", t);
+			}
 		}
 
 		int16_t val = 0 + 8192 * env * sin(t * 2 * 3.14159 * 440);
@@ -109,25 +119,22 @@ al_test()
 	alGenBuffers(1, &buffer);
 
 	int16_t* buf = gen_buf();
-	alBufferData(buffer, AL_FORMAT_MONO16, buf, 2 * FREQUENCY * sizeof(int16_t), FREQUENCY);
+	alBufferData(buffer, AL_FORMAT_MONO16, buf, 2 * DURATION * FREQUENCY * sizeof(int16_t), FREQUENCY);
 
 	ALuint source;
 	alGenSources(1, &source);
 	alSourcef(source, AL_PITCH, 1);
 	alSourcef(source, AL_GAIN, 1);
-	alSource3f(source, AL_POSITION, 1, 0, .4);
+	alSource3f(source, AL_POSITION, 0, 0, 0);
 	alSource3f(source, AL_VELOCITY, 0, 0, 0);
 	alSourcei(source, AL_LOOPING, false);
 	alSourcei(source, AL_BUFFER, buffer);
 
 	alSourcePlay(source);
 
-	float x = 1;
 	for (;;) {
 		ALint state;
 		alGetSourcei(source, AL_SOURCE_STATE, &state);
-		x -= .0001;
-		alSource3f(source, AL_POSITION, x, 0, .4);
 
 		if (state == AL_STOPPED) {
 			break;
