@@ -10,8 +10,6 @@
 #include <string.h>
 #include <unistd.h>
 
-//#include <AudioToolbox/AudioToolbox.h>
-
 // Include relative paths for OpenAL headers for portability.
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
@@ -24,21 +22,24 @@
 #define ENV_PCT 20
 
 static double
-waveform(double t, double f)
+waveform(double t, double f, double mix)
 {
-	double res = 0;
+	double res1 = 0;
 	for (uint64_t i = 1; i < 50; i++) {
-		res += 1. / i * sin(2 * M_PI * t * f * i);
-		res += -1. / (i + 1) * sin(2 * M_PI * (t * f + .5) * i);
+		res1 += 1. / i * sin(2 * M_PI * t * f * i);
+		res1 += -1. / (i + 1) * sin(2 * M_PI * (t * f + .5) * i);
 	}
-	return res / 2;
-	/*double res = 0;
+	res1 /= 2;
+
+	double res2 = 0;
 	for (uint64_t i = 1; i < 60; i++) {
 		uint64_t newi = 2 * i - 1;
-		res += (i % 2 == 1 ? -1. : 1) / (newi * newi) * sin(2 * M_PI * t * f * newi);
+		res2 += (i % 2 == 1 ? -1. : 1) / (newi * newi) * sin(M_PI_2 + 2 * M_PI * t * f * newi);
 		//res += -1. / (i + 1) * sin(2 * M_PI * (t * f + .25) * i);
 	}
-	return res * 3 / 4;*/
+	res2 *= 3. / 4;
+
+	return res1 * sqrt(1 - mix) + res2 * sqrt(mix);
 	//return sin(2 * M_PI * t * f);
 }
 
@@ -53,24 +54,28 @@ gen_buf()
 			1.f;
 
 		double t;
+		double mix;
 		if (i < DURATION * FREQUENCY / 3) {
 			t = (double) i / FREQUENCY;
+			mix = 1;
 		}
 		else if (i < 2 * DURATION * FREQUENCY / 3) {
 			uint64_t newi = i - DURATION * FREQUENCY / 3;
 			t = (double) i / FREQUENCY + ((double) newi * newi * 3 / (4 * DURATION * FREQUENCY * FREQUENCY));
+			mix = 1 - (double) newi / (DURATION * FREQUENCY / 3);
 		}
 		else {
 			double offset = -DURATION / 4.0;
 			t = (double) i * 3 / (2 * FREQUENCY) + offset;
+			mix = 0;
 		}
 
 #define SCALE 8000
 #define BASE_FREQ 220.
-		int16_t val = 0 + SCALE * env * waveform(t, BASE_FREQ);
-		int16_t val2 = 0 + SCALE * env * waveform(t, 5 * BASE_FREQ / 3);
-		int16_t val3 = 0 + SCALE * env * waveform(t, 11 * BASE_FREQ / 5);
-		int16_t val4 = 0 + SCALE * env * waveform(t, 5 * BASE_FREQ / 4);
+		int16_t val = 0 + SCALE * env * waveform(t, BASE_FREQ, mix);
+		int16_t val2 = 0 + SCALE * env * waveform(t, 5 * BASE_FREQ / 3, mix);
+		int16_t val3 = 0 + SCALE * env * waveform(t, 11 * BASE_FREQ / 5, mix);
+		int16_t val4 = 0 + SCALE * env * waveform(t, 5 * BASE_FREQ / 4, mix);
 
 		buf[2 * i + 0] = val + val3;
 		buf[2 * i + 1] = val2 + val4;

@@ -64,8 +64,8 @@ else()
 	message(SEND_ERROR "System not supported: ${CMAKE_SYSTEM_NAME}")
 endif()
 
-set(AUDIO_TOOLBOX_PLATFORMS)
-set(OPENAL_PLATFORMS Darwin Linux)
+set(AUDIO_TOOLBOX_PLATFORMS Darwin)
+set(OPENAL_PLATFORMS Linux)
 
 # check for graphics library support
 set(USE_AUDIO_TOOLBOX OFF)
@@ -155,7 +155,7 @@ if(NOT USE_AUDIO_TOOLBOX)
 	list(FILTER ASM_SRC EXCLUDE REGEX "^${PROJECT_SOURCE_DIR}/src/audio_toolbox/*")
 endif()
 
-if(NOT USE_OPENGL)
+if(NOT USE_OPENAL)
 	list(FILTER C_SRC EXCLUDE REGEX "^${PROJECT_SOURCE_DIR}/src/openal/*")
 	list(FILTER CXX_SRC EXCLUDE REGEX "^${PROJECT_SOURCE_DIR}/src/openal/*")
 	list(FILTER ASM_SRC EXCLUDE REGEX "^${PROJECT_SOURCE_DIR}/src/openal/*")
@@ -246,7 +246,6 @@ endif()
 
 if(USE_AUDIO_TOOLBOX)
 	target_compile_definitions(g2d PUBLIC USE_AUDIO_TOOLBOX)
-	message(SEND_ERROR "Not yet implemented")
 elseif(USE_OPENAL)
 	target_compile_definitions(g2d PUBLIC USE_OPENAL)
 
