@@ -280,7 +280,8 @@ if(USE_METAL)
 	)
 elseif(USE_OPENGL)
 	target_link_libraries(g2d
-		PRIVATE
+		# TODO change this to PRIVATE
+		PUBLIC
 			glfw GLEW ${OPENGL_LIBRARIES}
 	)
 endif()

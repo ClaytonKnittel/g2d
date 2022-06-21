@@ -60,8 +60,8 @@ static int gl_load_shader(GLuint * s, const char * file_path, int type) {
 }
 
 
-int gl_load_program(program * p, const char * restrict vert_path,
-        const char * restrict frag_path) {
+int gl_load_program(program * p, const char* vert_path,
+        const char* frag_path) {
     GLint status;
     GLuint vert, frag;
 

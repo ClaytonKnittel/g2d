@@ -6,6 +6,7 @@
 #include <GLFW/glfw3.h>
 
 #include <g2d/opengl/color.h>
+#include <g2d/opengl/drawable.h>
 
 typedef union wh {
     // width and height of the window

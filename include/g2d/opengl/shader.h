@@ -12,8 +12,8 @@ typedef struct program {
 } program;
 
 
-int gl_load_program(program * p, const char * restrict vert_path,
-        const char * restrict frag_path);
+int gl_load_program(program * p, const char* vert_path,
+        const char* frag_path);
 
 void gl_use_program(program * p);
 
