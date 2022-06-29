@@ -24,6 +24,9 @@ static uint32_t f2i(float f) {
 int
 main()
 {
+#ifdef USE_METAL
+	call_test_ray();
+#else
 	//return call_test_ray();
 	//return al_test();
 	//return audio_toolbox_test();
@@ -62,5 +65,6 @@ main()
 	gl_unload_static_monochrome_drawable(&d);
 
 	gl_exit(&gl_ctx);
+#endif
 }
 

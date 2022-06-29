@@ -47,10 +47,10 @@ set(ENABLE_TESTING OFF CACHE BOOL "When enabled, build all unit tests. The
 # Parameters
 ############################################################
 
-#set(METAL_PLATFORMS Darwin)
-#set(OPENGL_PLATFORMS Linux)
-set(METAL_PLATFORMS)
-set(OPENGL_PLATFORMS Darwin Linux)
+set(METAL_PLATFORMS Darwin)
+set(OPENGL_PLATFORMS Linux)
+#set(METAL_PLATFORMS)
+#set(OPENGL_PLATFORMS Darwin Linux)
 
 # check for graphics library support
 set(USE_METAL OFF)
@@ -112,6 +112,9 @@ file(GLOB_RECURSE C_SRC
 file(GLOB_RECURSE CXX_SRC
 	"${PROJECT_SOURCE_DIR}/src/*.cc"
 )
+file(GLOB_RECURSE OBJC_SRC
+	"${PROJECT_SOURCE_DIR}/src/*.m"
+)
 file(GLOB_RECURSE ASM_SRC
 	"${PROJECT_SOURCE_DIR}/src/*.s"
 )
@@ -133,12 +136,14 @@ endif()
 # remove arch_test dir
 list(FILTER C_SRC EXCLUDE REGEX "^${PROJECT_SOURCE_DIR}/src/arch_test/*")
 list(FILTER CXX_SRC EXCLUDE REGEX "^${PROJECT_SOURCE_DIR}/src/arch_test/*")
+list(FILTER OBJC_SRC EXCLUDE REGEX "^${PROJECT_SOURCE_DIR}/src/arch_test/*")
 list(FILTER ASM_SRC EXCLUDE REGEX "^${PROJECT_SOURCE_DIR}/src/arch_test/*")
 
 # remove opengl/metal specific directories if not in use
 if(NOT USE_METAL)
 	list(FILTER C_SRC EXCLUDE REGEX "^${PROJECT_SOURCE_DIR}/src/metal/*")
 	list(FILTER CXX_SRC EXCLUDE REGEX "^${PROJECT_SOURCE_DIR}/src/metal/*")
+	list(FILTER OBJC_SRC EXCLUDE REGEX "^${PROJECT_SOURCE_DIR}/src/metal/*")
 	list(FILTER ASM_SRC EXCLUDE REGEX "^${PROJECT_SOURCE_DIR}/src/metal/*")
 endif()
 
@@ -152,6 +157,7 @@ endif()
 if(NOT USE_AUDIO_TOOLBOX)
 	list(FILTER C_SRC EXCLUDE REGEX "^${PROJECT_SOURCE_DIR}/src/audio_toolbox/*")
 	list(FILTER CXX_SRC EXCLUDE REGEX "^${PROJECT_SOURCE_DIR}/src/audio_toolbox/*")
+	list(FILTER OBJC_SRC EXCLUDE REGEX "^${PROJECT_SOURCE_DIR}/src/audio_toolbox/*")
 	list(FILTER ASM_SRC EXCLUDE REGEX "^${PROJECT_SOURCE_DIR}/src/audio_toolbox/*")
 endif()
 
@@ -164,12 +170,16 @@ endif()
 
 if(${BUILD_SHARED_LIBS})
 	add_library(g2d SHARED
-		${C_SRC} ${CXX_SRC} ${ASM_SRC}
+		${C_SRC} ${CXX_SRC} ${OBJC_SRC} ${ASM_SRC}
 	)
 else()
 	add_library(g2d STATIC
-		${C_SRC} ${CXX_SRC} ${ASM_SRC}
+		${C_SRC} ${CXX_SRC} ${OBJC_SRC} ${ASM_SRC}
 	)
+endif()
+
+if("${CMAKE_SYSTEM_NAME}" MATCHES "Darwin" AND NOT "${OBJC_SRC}" STREQUAL "")
+	enable_language(OBJC)
 endif()
 
 if("${CMAKE_SYSTEM_PROCESSOR}" MATCHES "x86_64")

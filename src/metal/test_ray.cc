@@ -3,8 +3,10 @@
 #include <sys/stat.h>
 
 #include <g2d/g2d.h>
-#include <g2d/metal/metal.h>
+#include <g2d/metal/metal_headers.h>
 #include <g2d/metal/metal_shader_lib_source.h>
+
+#include <g2d/metal/key_process.h>
 
 namespace shader_types
 {
@@ -399,6 +401,7 @@ public:
 int
 call_test_ray()
 {
+	test_objc(0);
 	NS::AutoreleasePool* pool = NS::AutoreleasePool::alloc()->init();
 
 	AppDelegate del;

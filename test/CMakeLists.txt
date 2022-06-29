@@ -60,9 +60,9 @@ target_link_directories(g2d_unit_testing
 
 target_link_libraries(g2d_unit_testing
 	PRIVATE
-		g2d utils check
+		g2d utils
 	PUBLIC
-		"${LINK_LIBS}"
+		"${LINK_LIBS}" check
 )
 
 get_filename_component(UTILS_DIR ../ ABSOLUTE)
