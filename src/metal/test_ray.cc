@@ -401,9 +401,6 @@ public:
 int
 call_test_ray()
 {
-	test_objc(0);
-	return 0;
-
 	NS::AutoreleasePool* pool = NS::AutoreleasePool::alloc()->init();
 
 	AppDelegate del;

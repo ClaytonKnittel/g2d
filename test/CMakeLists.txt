@@ -23,25 +23,9 @@ file(GLOB_RECURSE CXX_TEST_SRC
 	"${PROJECT_SOURCE_DIR}/test_*.cc"
 )
 
-if("${CMAKE_SYSTEM_NAME}" MATCHES "Darwin")
-add_executable(g2d_unit_testing MACOSX_BUNDLE
-	${C_TEST_SRC} ${CXX_TEST_SRC} "${PROJECT_SOURCE_DIR}/../src/metal/res/Main.storyboard"
-)
-
-set_target_properties(g2d_unit_testing PROPERTIES
-    BUNDLE True
-	RESOURCE "${PROJECT_SOURCE_DIR}/../src/metal/res/Main.storyboard"
-	#MACOSX_BUNDLE_GUI_IDENTIFIER my.domain.style.identifier.${CUR_TARGET}
-    MACOSX_BUNDLE_BUNDLE_NAME g2d_unit_testing
-    MACOSX_BUNDLE_BUNDLE_VERSION "0.1"
-    MACOSX_BUNDLE_SHORT_VERSION_STRING "0.1"
-	MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/src/metal/res/Info.plist
-)
-else()
 add_executable(g2d_unit_testing
 	${C_TEST_SRC} ${CXX_TEST_SRC}
 )
-endif()
 
 add_custom_target(run_g2d_tests
 	${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME} DEPENDS g2d_unit_testing

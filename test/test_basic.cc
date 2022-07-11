@@ -25,8 +25,8 @@ int
 main()
 {
 #ifdef USE_METAL
-	//call_test_ray();
-	app_main(0, NULL);
+	call_test_ray();
+	//app_main(0, NULL);
 #else
 	//return call_test_ray();
 	//return al_test();
