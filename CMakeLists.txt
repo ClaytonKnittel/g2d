@@ -287,6 +287,7 @@ if(USE_METAL)
 			"-framework QuartzCore"
 			"-framework Metal"
 			"-framework MetalKit"
+			"-framework AppKit"
 	)
 elseif(USE_OPENGL)
 	target_link_libraries(g2d

@@ -25,7 +25,8 @@ int
 main()
 {
 #ifdef USE_METAL
-	call_test_ray();
+	//call_test_ray();
+	app_main(0, NULL);
 #else
 	//return call_test_ray();
 	//return al_test();
@@ -49,8 +50,8 @@ main()
 
 	program p;
 	gl_load_program(&p,
-			"/home/claytonknittel/Documents/g2d/src/opengl/res/two.vs",
-			"/home/claytonknittel/Documents/g2d/src/opengl/res/two.fs");
+			"/Users/ClaytonKnittel/VSCode/g2d/src/opengl/res/two.vs",
+			"/Users/ClaytonKnittel/VSCode/g2d/src/opengl/res/two.fs");
 
 	while (!gl_should_exit(&gl_ctx)) {
 		gl_clear(&gl_ctx);
