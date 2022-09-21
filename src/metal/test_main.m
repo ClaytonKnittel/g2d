@@ -208,6 +208,22 @@ const int uniformBufferCount = 3;
     return self;
 }
 
+- (BOOL)acceptsFirstResponder {
+	return YES;
+}
+
+- (void)mouseDown:(NSEvent *)event {
+	NSLog(@"Mouse down!!!");
+}
+
+- (void)keyDown:(NSEvent *)event {
+	NSLog(@"Key DOWN!!!!!!!");
+}
+
+- (void)keyUp:(NSEvent *)event {
+	NSLog(@"KEy UP!");
+}
+
 - (void)setup {
     // Set view settings.
     self.colorPixelFormat = MTLPixelFormatBGRA8Unorm;
@@ -266,9 +282,11 @@ const int uniformBufferCount = 3;
         {{0, 0.5, 0}, {0, 255, 0, 255}},
         {{0.5, -0.5, 0}, {0, 0, 255, 255}}
     };
-    _vertexBuffer = [self.device newBufferWithBytes:verts
+	char buf[sizeof(verts)];
+	memcpy(buf, verts, sizeof(verts));
+    _vertexBuffer = [self.device newBufferWithBytes:buf
                                              length:sizeof(verts)
-                                            options:MTLResourceStorageModePrivate];
+                                            options:MTLResourceStorageModeShared];
 
     // Create uniform buffers.
     for (int i = 0; i < uniformBufferCount; i++) {

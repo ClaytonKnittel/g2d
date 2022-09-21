@@ -99,6 +99,14 @@ add_library(g2d_metal_shaders SHARED
 set_target_properties(g2d_metal_shaders PROPERTIES SUFFIX ".metallib")
 enable_language(METAL)
 
+# When building in Debug mode, enable Metal validation layer.
+if("${CMAKE_BUILD_TYPE}" MATCHES "Debug")
+	set(METAL_VALIDATION_ENV METAL_DEVICE_WRAPPER_TYPE=1
+		METAL_ERROR_MODE=5 METAL_DEBUG_ERROR_MODE=5)
+else()
+	set(METAL_VALIDATION_ENV)
+endif()
+
 endif()
 
 

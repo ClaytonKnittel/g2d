@@ -39,6 +39,21 @@ half4 fragment rayFragment(v2f in [[stage_in]], texture2d<half, access::sample> 
 }
 
 
+
+enum VertexAttributes {
+    VertexAttributePosition = 0,
+    VertexAttributeColor = 1,
+};
+
+enum BufferIndex  {
+    MeshVertexBuffer = 0,
+    FrameUniformBuffer = 1,
+};
+
+struct FrameUniforms {
+    simd::float4x4 projectionViewModel;
+};
+
 struct VertexInput {
     float3 position [[attribute(VertexAttributePosition)]];
     half4 color [[attribute(VertexAttributeColor)]];
