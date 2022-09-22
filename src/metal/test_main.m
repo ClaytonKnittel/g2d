@@ -169,7 +169,7 @@ app_main(int argc, char *argv[])
 		// Custom MTKView.
 		HelloMetalView* view = [[HelloMetalView alloc] initWithFrame:frame];
 		window.contentView = view;
-
+		[window makeFirstResponder:view];
 
 		//[NSApp setDelegate : delegate];
 		[NSApp run];
@@ -212,16 +212,28 @@ const int uniformBufferCount = 3;
 	return YES;
 }
 
+- (BOOL)becomeFirstResponder {
+	return YES;
+}
+
+- (BOOL)resignFirstResponder {
+	return YES;
+}
+
 - (void)mouseDown:(NSEvent *)event {
+	NSLog(@"super view: %@", [self superview]);
+	NSLog(@"super view: %@", [[self superview] superview]);
 	NSLog(@"Mouse down!!!");
 }
 
 - (void)keyDown:(NSEvent *)event {
-	NSLog(@"Key DOWN!!!!!!!");
+	NSString *keys = [event charactersIgnoringModifiers];
+	NSLog(@"Key down %@", keys);
 }
 
 - (void)keyUp:(NSEvent *)event {
-	NSLog(@"KEy UP!");
+	NSString *keys = [event charactersIgnoringModifiers];
+	NSLog(@"Key up %@", keys);
 }
 
 - (void)setup {
