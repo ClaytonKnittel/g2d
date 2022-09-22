@@ -158,7 +158,7 @@ app_main(int argc, char *argv[])
 		NSApp.mainMenu = bar;
 
 		// Window.
-		NSRect frame = NSMakeRect(0, 0, 256, 256);
+		NSRect frame = NSMakeRect(0, 0, 800, 800);
 		NSWindow* window = [[NSWindow alloc]
 			initWithContentRect:frame styleMask:NSTitledWindowMask
 						backing:NSBackingStoreBuffered defer:NO];
@@ -228,7 +228,29 @@ const int uniformBufferCount = 3;
 
 - (void)keyDown:(NSEvent *)event {
 	NSString *keys = [event charactersIgnoringModifiers];
-	NSLog(@"Key down %@", keys);
+
+	if (![event isARepeat]) {
+
+		if ([event modifierFlags] & NSEventModifierFlagNumericPad) {
+			switch ([keys characterAtIndex:0]) {
+			   case NSLeftArrowFunctionKey:
+				   NSLog(@"Left");
+				   break;
+			   case NSRightArrowFunctionKey:
+				   NSLog(@"Right");
+				   break;
+			   case NSUpArrowFunctionKey:
+				   NSLog(@"Up");
+				   break;
+			   case NSDownArrowFunctionKey:
+				   NSLog(@"Down");
+				   break;
+			}
+		}
+		else {
+			NSLog(@"Key down %@", keys);
+		}
+	}
 }
 
 - (void)keyUp:(NSEvent *)event {
