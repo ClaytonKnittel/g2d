@@ -221,8 +221,6 @@ const int uniformBufferCount = 3;
 }
 
 - (void)mouseDown:(NSEvent *)event {
-	NSLog(@"super view: %@", [self superview]);
-	NSLog(@"super view: %@", [[self superview] superview]);
 	NSLog(@"Mouse down!!!");
 }
 
