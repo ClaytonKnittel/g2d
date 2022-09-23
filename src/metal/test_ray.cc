@@ -118,13 +118,14 @@ class Renderer {
   void buildBuffers() {
     const float s = 0.5f;
 
-    shader_types::VertexData verts[] = {// Positions   Tex Coords
-                                        {{-s, -s}, {0.f, 0.f}},
-                                        {{+s, -s}, {1.f, 0.f}},
-                                        {{+s, +s}, {1.f, 1.f}},
-                                        {{-s, +s}, {0.f, 1.f}}};
+    shader_types::VertexData verts[] = { // Positions   Tex Coords
+                                         { { -s, -s }, { 0.f, 0.f } },
+                                         { { +s, -s }, { 1.f, 0.f } },
+                                         { { +s, +s }, { 1.f, 1.f } },
+                                         { { -s, +s }, { 0.f, 1.f } }
+    };
 
-    uint16_t v_index[] = {0, 1, 2, 2, 3, 0};
+    uint16_t v_index[] = { 0, 1, 2, 2, 3, 0 };
 
     m_vertex_buf =
         m_device->newBuffer(sizeof(verts), MTL::ResourceStorageModeManaged);
@@ -217,9 +218,9 @@ class Renderer {
       float y = sinf((frac + (float)frame / 200.f) * 2.f * M_PI);
 
       instance_buf[i].instanceTransform = (simd::float3x3){
-          (simd::float3){scl * sinf(angle), scl * cosf(angle), 0.f},
-          (simd::float3){scl * cosf(angle), -scl * sinf(angle), 0.f},
-          (simd::float3){x, y, 1.f},
+        (simd::float3){ scl * sinf(angle), scl * cosf(angle), 0.f },
+        (simd::float3){ scl * cosf(angle), -scl * sinf(angle), 0.f },
+        (simd::float3){ x, y, 1.f },
       };
     }
     instance_buf_ptr->didModifyRange(
@@ -378,7 +379,7 @@ class AppDelegate : public NS::ApplicationDelegate {
 
     m_view_delegate = new ViewDelegate(m_device);
 
-    CGRect frame = {{0, 0}, {600, 600}};
+    CGRect frame = { { 0, 0 }, { 600, 600 } };
 
     m_window = NS::Window::alloc()->init(
         frame, NS::WindowStyleMaskClosable | NS::WindowStyleMaskTitled,

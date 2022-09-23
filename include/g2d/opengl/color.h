@@ -28,7 +28,7 @@ static float color_fval(color_t color) {
   union {
     uint32_t ival;
     float fval;
-  } c = {.ival = color};
+  } c = { .ival = color };
   return c.fval;
 }
 

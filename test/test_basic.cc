@@ -37,12 +37,12 @@ int main() {
 
   drawable d;
   uint32_t vertices[] = {
-      f2i(-0.5), f2i(-0.5), gen_color(140, 80, 90, 255),
-      f2i(-0.5), f2i(0.5),  gen_color(0, 0, 100, 255),
-      f2i(0.5),  f2i(0.5),  gen_color(0, 100, 0, 255),
-      f2i(0.5),  f2i(0.5),  gen_color(0, 100, 0, 255),
-      f2i(0.5),  f2i(-0.5), gen_color(10, 10, 10, 255),
-      f2i(-0.5), f2i(-0.5), gen_color(140, 80, 90, 255),
+    f2i(-0.5), f2i(-0.5), gen_color(140, 80, 90, 255),
+    f2i(-0.5), f2i(0.5),  gen_color(0, 0, 100, 255),
+    f2i(0.5),  f2i(0.5),  gen_color(0, 100, 0, 255),
+    f2i(0.5),  f2i(0.5),  gen_color(0, 100, 0, 255),
+    f2i(0.5),  f2i(-0.5), gen_color(10, 10, 10, 255),
+    f2i(-0.5), f2i(-0.5), gen_color(140, 80, 90, 255),
   };
   gl_load_static_monochrome_drawable(&d, vertices, 6);
 
