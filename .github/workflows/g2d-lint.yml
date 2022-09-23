@@ -1,0 +1,21 @@
+name: Lint
+
+on:
+  push:
+  pull_request:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out g2d
+      uses: actions/checkout@v2
+      with:
+        path: g2d
+        submodules: recursive
+    - name: Run clang-format
+      uses: DoozyX/clang-format-lint-action@v0.14
+      with:
+        source: '.'
+        exclude: './modules'
+        extensions: 'h,c,cc'
+        clangFormatVersion: 14
