@@ -4,14 +4,14 @@
 #include <stdlib.h>
 #include <time.h>
 
-#include <g2d/log.h>
+#include <g2d/common/log.h>
 
 #ifndef RELEASE_BUILD
 
 const char* log_prio_prefixes[] = {
-  // LOG_PRIO_CRITICAL
-  "[CRIT]",
-  // LOG_PRIO_DEBUG
+  "[ERR]",
+  "[WRN]",
+  "[INF]",
   "[DBG]",
 };
 

@@ -14,7 +14,9 @@ else()
 	set(LINUX_DISTR "")
 endif()
 
-find_library(check check REQUIRED)
+enable_testing()
+find_package(GTest REQUIRED)
+include(GoogleTest)
 
 file(GLOB_RECURSE C_TEST_SRC
 	"${PROJECT_SOURCE_DIR}/test_*.c"
@@ -27,10 +29,12 @@ add_executable(g2d_unit_testing
 	${C_TEST_SRC} ${CXX_TEST_SRC}
 )
 
-add_custom_target(run_g2d_tests
-	COMMAND ${METAL_VALIDATION_ENV} ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}
-	DEPENDS g2d_unit_testing
-)
+gtest_discover_tests(g2d_unit_testing)
+
+#add_custom_target(run_g2d_tests
+#	COMMAND ${METAL_VALIDATION_ENV} ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}
+#	DEPENDS g2d_unit_testing
+#)
 
 target_compile_options(g2d_unit_testing PRIVATE
 	-Wpedantic -Wall -Wextra -Wno-unused-function -Wno-format
@@ -61,9 +65,7 @@ target_link_directories(g2d_unit_testing
 
 target_link_libraries(g2d_unit_testing
 	PRIVATE
-		g2d utils
-	PUBLIC
-		"${LINK_LIBS}" check
+		g2d utils "${LINK_LIBS}" GTest::GTest GTest::Main
 )
 
 get_filename_component(UTILS_DIR ../ ABSOLUTE)

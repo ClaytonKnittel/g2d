@@ -21,6 +21,7 @@ static uint32_t f2i(float f) {
   return tmp.int_val;
 }
 
+/*
 int main() {
 #ifdef USE_METAL
   // call_test_ray();
@@ -65,3 +66,4 @@ int main() {
   gl_exit(&gl_ctx);
 #endif
 }
+*/
