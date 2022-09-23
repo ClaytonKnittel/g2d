@@ -5,14 +5,13 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-#include <g2d/opengl/shader.h>
 #include <g2d/opengl/color.h>
+#include <g2d/opengl/shader.h>
 
 typedef struct drawable {
-    GLuint vao, vbo;
-    uint64_t size;
+  GLuint vao, vbo;
+  uint64_t size;
 } drawable;
-
 
 /*
  * initializes a static drawable (fixed shape, variable size and position).
@@ -27,8 +26,7 @@ typedef struct drawable {
  *
  */
 int gl_load_static_indexed_drawable(drawable *d, uint32_t *data,
-        size_t n_vertices);
-
+                                    size_t n_vertices);
 
 /*
  * initializes a static drawable (fixed shape, variable size and position).
@@ -41,26 +39,23 @@ int gl_load_static_indexed_drawable(drawable *d, uint32_t *data,
  * where color each element is of width 4 bytes
  */
 int gl_load_static_monochrome_drawable(drawable *d, uint32_t *data,
-        size_t n_vertices);
-
+                                       size_t n_vertices);
 
 static void gl_unload_static_monochrome_drawable(drawable *d) {
-    glDeleteVertexArrays(1, &d->vao);
-    glDeleteBuffers(1, &d->vbo);
+  glDeleteVertexArrays(1, &d->vao);
+  glDeleteBuffers(1, &d->vbo);
 }
 
-
 static void gl_draw(drawable *d) {
-    glBindVertexArray(d->vao);
-    glDrawArrays(GL_TRIANGLES, 0, d->size);
-    glBindVertexArray(0);
+  glBindVertexArray(d->vao);
+  glDrawArrays(GL_TRIANGLES, 0, d->size);
+  glBindVertexArray(0);
 }
 
 static void gl_draw_instanced(drawable *d, GLsizei primcount) {
-    glBindVertexArray(d->vao);
-    glDrawArraysInstanced(GL_TRIANGLES, 0, d->size, primcount);
-    glBindVertexArray(0);
+  glBindVertexArray(d->vao);
+  glDrawArraysInstanced(GL_TRIANGLES, 0, d->size, primcount);
+  glBindVertexArray(0);
 }
-
 
 #endif /* _DRAWABLE_H */

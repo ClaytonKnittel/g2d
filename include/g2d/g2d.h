@@ -21,14 +21,14 @@ extern "C" {
 #endif /* __cplusplus */
 
 typedef struct g2d_context {
-	uint32_t width;
-	uint32_t height;
+  uint32_t width;
+  uint32_t height;
 
-	uint32_t target_framerate;
+  uint32_t target_framerate;
 
-	//color_t background_color;
+  // color_t background_color;
 
-	const char* title;
+  const char* title;
 } g2d_context_t;
 
 /*
