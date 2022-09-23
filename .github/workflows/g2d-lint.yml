@@ -17,5 +17,5 @@ jobs:
       with:
         source: '.'
         exclude: './modules'
-        extensions: 'h,c,cc'
+        extensions: 'h,c,cc,m'
         clangFormatVersion: 14
