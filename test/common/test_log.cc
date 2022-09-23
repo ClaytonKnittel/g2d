@@ -4,15 +4,23 @@
 #include <gtest/gtest.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <utils/os/dircntl.h>
 
 #include <g2d/common/log.h>
 
 using ::testing::MatchesRegex;
 
 class LogFixture : public ::testing::Test {
+ private:
+  void _InitTmpDir() {
+    ASSERT_EQ(mkdirp(tmp_dir_, S_IRWXU), 0);
+  }
+
  protected:
   void SetUp() override {
-    char fname[] = "XXXXXX";
+    _InitTmpDir();
+
+    char fname[] = "/tmp/g2d_unit_tests/test_log/XXXXXX";
     tmp_fd_ = mkstemp(fname);
     ASSERT_GE(tmp_fd_, 0);
 
@@ -58,10 +66,13 @@ class LogFixture : public ::testing::Test {
   }
 
  private:
+  static const char* tmp_dir_;
   int stderr_fd_;
   int tmp_fd_;
   off_t last_offset_;
 };
+
+const char* LogFixture::tmp_dir_ = "/tmp/g2d_unit_tests/test_log";
 
 TEST_F(LogFixture, TestLogNoArguments) {
   g2dlog(INF, "Hello");

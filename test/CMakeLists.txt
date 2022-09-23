@@ -31,10 +31,10 @@ add_executable(g2d_unit_testing
 
 gtest_discover_tests(g2d_unit_testing)
 
-#add_custom_target(run_g2d_tests
-#	COMMAND ${METAL_VALIDATION_ENV} ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}
-#	DEPENDS g2d_unit_testing
-#)
+add_custom_target(run_g2d_tests
+	COMMAND ${METAL_VALIDATION_ENV} ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}
+	DEPENDS g2d_unit_testing
+)
 
 target_compile_options(g2d_unit_testing PRIVATE
 	-Wpedantic -Wall -Wextra -Wno-unused-function -Wno-format

@@ -1,0 +1,38 @@
+name: Build and Unit Test
+
+on:
+  push:
+    branches: [ master ]
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+
+    steps:
+    - name: Setup cmake
+      uses: jwlawson/actions-setup-cmake@v1.12
+      with:
+        cmake-version: '3.22.1'
+    - name: install ubuntu dependencies
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        sudo apt-get update -y
+        sudo apt-get install -y libsubunit-dev lsb-release
+    - name: Check out g2d
+      uses: actions/checkout@v2
+      with:
+        path: g2d
+        submodules: recursive
+    - name: Initialize and Build
+      working-directory: g2d
+      run: |
+        mkdir build && cd build
+        cmake .. -DCMAKE_BUILD_TYPE=RelWithDebugInfo -DENABLE_TESTING=ON -DBUILD_SHARED_LIBS=ON
+        make
+    - name: Run Unit Tests
+      working-directory: g2d/build
+      run: |
+        make run_g2d_tests

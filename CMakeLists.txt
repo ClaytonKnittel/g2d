@@ -369,5 +369,7 @@ add_custom_command(
 # Submodule Dependencies
 ############################################################
 
+set(ENABLE_TESTING OFF)
+
 add_subdirectory(modules/utils)
 
