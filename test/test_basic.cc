@@ -13,59 +13,55 @@
 #include <check.h>
 
 static uint32_t f2i(float f) {
-	union cvt_f2i {
-		int int_val;
-		float float_val;
-	} tmp;
-	tmp.float_val = f;
-	return tmp.int_val;
+  union cvt_f2i {
+    int int_val;
+    float float_val;
+  } tmp;
+  tmp.float_val = f;
+  return tmp.int_val;
 }
 
-int
-main()
-{
+int main() {
 #ifdef USE_METAL
-	//call_test_ray();
-	app_main(0, NULL);
+  // call_test_ray();
+  app_main(0, NULL);
 #else
-	//return call_test_ray();
-	//return al_test();
-	//return audio_toolbox_test();
+  // return call_test_ray();
+  // return al_test();
+  // return audio_toolbox_test();
 
-	gl_context_t gl_ctx;
-	gl_init(&gl_ctx, 640, 480);
+  gl_context_t gl_ctx;
+  gl_init(&gl_ctx, 640, 480);
 
-	gl_set_bg_color(gen_color(240, 230, 220, 255));
+  gl_set_bg_color(gen_color(240, 230, 220, 255));
 
-	drawable d;
-	uint32_t vertices[] = {
-		f2i(-0.5), f2i(-0.5), gen_color(140, 80, 90, 255),
-		f2i(-0.5), f2i(0.5), gen_color(0, 0, 100, 255),
-		f2i(0.5), f2i(0.5), gen_color(0, 100, 0, 255),
-		f2i(0.5), f2i(0.5), gen_color(0, 100, 0, 255),
-		f2i(0.5), f2i(-0.5), gen_color(10, 10, 10, 255),
-		f2i(-0.5), f2i(-0.5), gen_color(140, 80, 90, 255),
-	};
-	gl_load_static_monochrome_drawable(&d, vertices, 6);
+  drawable d;
+  uint32_t vertices[] = {
+      f2i(-0.5), f2i(-0.5), gen_color(140, 80, 90, 255),
+      f2i(-0.5), f2i(0.5),  gen_color(0, 0, 100, 255),
+      f2i(0.5),  f2i(0.5),  gen_color(0, 100, 0, 255),
+      f2i(0.5),  f2i(0.5),  gen_color(0, 100, 0, 255),
+      f2i(0.5),  f2i(-0.5), gen_color(10, 10, 10, 255),
+      f2i(-0.5), f2i(-0.5), gen_color(140, 80, 90, 255),
+  };
+  gl_load_static_monochrome_drawable(&d, vertices, 6);
 
-	program p;
-	gl_load_program(&p,
-			"/Users/ClaytonKnittel/VSCode/g2d/src/opengl/res/two.vs",
-			"/Users/ClaytonKnittel/VSCode/g2d/src/opengl/res/two.fs");
+  program p;
+  gl_load_program(&p, "/Users/ClaytonKnittel/VSCode/g2d/src/opengl/res/two.vs",
+                  "/Users/ClaytonKnittel/VSCode/g2d/src/opengl/res/two.fs");
 
-	while (!gl_should_exit(&gl_ctx)) {
-		gl_clear(&gl_ctx);
+  while (!gl_should_exit(&gl_ctx)) {
+    gl_clear(&gl_ctx);
 
-		gl_use_program(&p);
-		gl_draw(&d);
+    gl_use_program(&p);
+    gl_draw(&d);
 
-		gl_render(&gl_ctx);
-	}
+    gl_render(&gl_ctx);
+  }
 
-	gl_unload_program(&p);
-	gl_unload_static_monochrome_drawable(&d);
+  gl_unload_program(&p);
+  gl_unload_static_monochrome_drawable(&d);
 
-	gl_exit(&gl_ctx);
+  gl_exit(&gl_ctx);
 #endif
 }
-
