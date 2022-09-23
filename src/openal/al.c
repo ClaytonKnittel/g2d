@@ -43,29 +43,29 @@ static double waveform(double t, double f, double mix) {
 }
 
 static int16_t* gen_buf() {
-  int16_t* buf = (int16_t*)malloc(DURATION * FREQUENCY * 2 * sizeof(uint16_t));
+  int16_t* buf = (int16_t*) malloc(DURATION * FREQUENCY * 2 * sizeof(uint16_t));
 
   for (uint64_t i = 0; i < DURATION * FREQUENCY; i++) {
     float env = (i < DURATION * FREQUENCY / ENV_PCT)
-                    ? (float)i / (DURATION * FREQUENCY / ENV_PCT)
+                    ? (float) i / (DURATION * FREQUENCY / ENV_PCT)
                 : (i > (ENV_PCT - 1) * DURATION * FREQUENCY / ENV_PCT)
-                    ? (float)(DURATION * FREQUENCY - i) /
+                    ? (float) (DURATION * FREQUENCY - i) /
                           (DURATION * FREQUENCY / ENV_PCT)
                     : 1.f;
 
     double t;
     double mix;
     if (i < DURATION * FREQUENCY / 3) {
-      t = (double)i / FREQUENCY;
+      t = (double) i / FREQUENCY;
       mix = 1;
     } else if (i < 2 * DURATION * FREQUENCY / 3) {
       uint64_t newi = i - DURATION * FREQUENCY / 3;
-      t = (double)i / FREQUENCY +
-          ((double)newi * newi * 3 / (4 * DURATION * FREQUENCY * FREQUENCY));
-      mix = 1 - (double)newi / (DURATION * FREQUENCY / 3);
+      t = (double) i / FREQUENCY +
+          ((double) newi * newi * 3 / (4 * DURATION * FREQUENCY * FREQUENCY));
+      mix = 1 - (double) newi / (DURATION * FREQUENCY / 3);
     } else {
       double offset = -DURATION / 4.0;
-      t = (double)i * 3 / (2 * FREQUENCY) + offset;
+      t = (double) i * 3 / (2 * FREQUENCY) + offset;
       mix = 0;
     }
 
@@ -139,7 +139,7 @@ int al_test() {
   check_err(device);
 
   if (attrs_size > 0) {
-    ALCint* attrs = (ALCint*)malloc(attrs_size * sizeof(ALCint));
+    ALCint* attrs = (ALCint*) malloc(attrs_size * sizeof(ALCint));
     alcGetIntegerv(device, ALC_ALL_ATTRIBUTES, attrs_size, attrs);
     check_err(device);
     for (uint32_t i = 0; i < (attrs_size - 1) / 2u; i++) {

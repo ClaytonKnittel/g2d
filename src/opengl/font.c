@@ -55,7 +55,7 @@ int font_init(font_t *f, const char *font_path, uint64_t font_height) {
     return error;
   }
 
-  f->glyphs = (glyph *)malloc(num_glyphs * sizeof(glyph));
+  f->glyphs = (glyph *) malloc(num_glyphs * sizeof(glyph));
   if (f->glyphs == NULL) {
     fprintf(stderr, "Could not allocate %lu bytes\n",
             num_glyphs * sizeof(glyph));
@@ -93,7 +93,7 @@ int font_init(font_t *f, const char *font_path, uint64_t font_height) {
   f->tex_width = ALIGN_UP(cum_width, 4);
   f->tex_height = max_height;
 
-  tex_buf = (uint8_t *)calloc(f->tex_width * f->tex_height, sizeof(uint8_t));
+  tex_buf = (uint8_t *) calloc(f->tex_width * f->tex_height, sizeof(uint8_t));
   if (tex_buf == NULL) {
     fprintf(stderr, "Could not malloc %lu bytes\n",
             f->tex_width * f->tex_height * sizeof(uint8_t));
@@ -112,7 +112,7 @@ int font_init(font_t *f, const char *font_path, uint64_t font_height) {
     }
 
     glyph *g = &f->glyphs[idx];
-    uint8_t *b = (uint8_t *)face->glyph->bitmap.buffer;
+    uint8_t *b = (uint8_t *) face->glyph->bitmap.buffer;
 
     for (uint32_t row = 0; row < g->h; row++) {
       for (uint32_t col = 0; col < g->w; col++) {
@@ -171,11 +171,11 @@ int font_init(font_t *f, const char *font_path, uint64_t font_height) {
 
   // position attribute
   glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE,
-                        DATA_PER_VERT * sizeof(GL_FLOAT), (GLvoid *)0);
+                        DATA_PER_VERT * sizeof(GL_FLOAT), (GLvoid *) 0);
   // texture coordinates attribute
   glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE,
                         DATA_PER_VERT * sizeof(GL_FLOAT),
-                        (GLvoid *)(2 * sizeof(float)));
+                        (GLvoid *) (2 * sizeof(float)));
 
   glBindVertexArray(0);
 
@@ -207,7 +207,7 @@ static void _font_render(font_t *f, const char *text, float x_pos, float y_pos,
   float max_x = x_pos + width;
 
   // factor by which units in pixels convert to normalized screen coords
-  float px_to_norm = line_height / (float)f->tex_height;
+  float px_to_norm = line_height / (float) f->tex_height;
 
   // make initializing render calls
   gl_use_program(&f->p);
@@ -243,11 +243,11 @@ static void _font_render(font_t *f, const char *text, float x_pos, float y_pos,
       float y2 = pen_y + (px_to_norm * g->bt);
       float y1 = y2 - (px_to_norm * g->h);
 
-      float tx1 = (float)g->x_off / (float)f->tex_width;
-      float tx2 = tx1 + ((float)g->w / (float)f->tex_width);
+      float tx1 = (float) g->x_off / (float) f->tex_width;
+      float tx2 = tx1 + ((float) g->w / (float) f->tex_width);
 
-      float ty1 = (float)g->y_off / (float)f->tex_height;
-      float ty2 = ty1 + ((float)g->h / (float)f->tex_height);
+      float ty1 = (float) g->y_off / (float) f->tex_height;
+      float ty2 = ty1 + ((float) g->h / (float) f->tex_height);
 
       if (x2 > max_x && pen_x != x_pos) {
         // only skip to next line if we will overflow outside the width

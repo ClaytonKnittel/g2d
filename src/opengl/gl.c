@@ -8,7 +8,7 @@
 #include <g2d/opengl/gl.h>
 
 static gl_context_t* _get_window_context(GLFWwindow* w) {
-  return (gl_context_t*)glfwGetWindowUserPointer(w);
+  return (gl_context_t*) glfwGetWindowUserPointer(w);
 }
 
 static void _gl_key_callback_proxy(GLFWwindow* w, int key, int action,

@@ -9,7 +9,7 @@ static void CheckError(OSStatus error, const char *operation) {
   }
 
   char errorString[20];
-  *(UInt32 *)(errorString + 1) =
+  *(UInt32 *) (errorString + 1) =
       CFSwapInt32HostToBig(error);  // we have 4 bytes and we put them in
                                     // Big-endian ordering. 1st byte the biggest
   if (isprint(errorString[1]) && isprint(errorString[2]) &&
@@ -17,7 +17,7 @@ static void CheckError(OSStatus error, const char *operation) {
     errorString[0] = errorString[5] = '\'';
     errorString[6] = '\0';
   } else {
-    sprintf(errorString, "%d", (int)error);
+    sprintf(errorString, "%d", (int) error);
   }
   fprintf(stderr, "Error: %s (%s)\n", operation, errorString);
   exit(1);
@@ -35,7 +35,7 @@ static OSStatus SineWaveRenderProc(void *inRefCon,
                                    const AudioTimeStamp *inTimeStamp,
                                    UInt32 inBusNumber, UInt32 inNumberFrames,
                                    AudioBufferList *ioData) {
-  CallBackData *pCallBackData = (CallBackData *)inRefCon;
+  CallBackData *pCallBackData = (CallBackData *) inRefCon;
   double frameInPeriod = pCallBackData->startingFrameCount;
 
   // This is the number of samples/frames we need to cover a period/cycle
@@ -49,7 +49,7 @@ static OSStatus SineWaveRenderProc(void *inRefCon,
     // We populate the current frame audio data value/sample with the result of
     // `sin` function
     Float32 sampleValue =
-        (Float32)sin(2 * M_PI * (frameInPeriod / sinePeriodLengthInFrames));
+        (Float32) sin(2 * M_PI * (frameInPeriod / sinePeriodLengthInFrames));
     sampleValue *= 0.5;
 
     // I go to the first buffer and the value of `mData` and save it into a
@@ -57,11 +57,11 @@ static OSStatus SineWaveRenderProc(void *inRefCon,
     // data buffer.
 
     // first for the +left+ channel
-    Float32 *data = (Float32 *)ioData->mBuffers[0].mData;
+    Float32 *data = (Float32 *) ioData->mBuffers[0].mData;
     (data)[frame] = sampleValue;
 
     // then for the right channel too
-    data = (Float32 *)ioData->mBuffers[1].mData;
+    data = (Float32 *) ioData->mBuffers[1].mData;
     (data)[frame] = sampleValue;
 
     frameInPeriod += 1.0;

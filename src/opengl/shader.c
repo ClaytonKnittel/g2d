@@ -19,7 +19,7 @@ static int gl_load_shader(GLuint* s, const char* file_path, int type) {
     return -1;
   }
 
-  buf = (GLchar*)malloc(MAX_FILE_SIZE * sizeof(GLchar));
+  buf = (GLchar*) malloc(MAX_FILE_SIZE * sizeof(GLchar));
   if (buf == NULL) {
     fprintf(stderr,
             "Unable to allocate %d bytes for shader program "
@@ -28,7 +28,7 @@ static int gl_load_shader(GLuint* s, const char* file_path, int type) {
     return -1;
   }
 
-  n_read = (GLint)fread((char*)buf, 1, MAX_FILE_SIZE, f);
+  n_read = (GLint) fread((char*) buf, 1, MAX_FILE_SIZE, f);
 
   fclose(f);
 
@@ -39,7 +39,7 @@ static int gl_load_shader(GLuint* s, const char* file_path, int type) {
   }
 
   *s = glCreateShader(type);
-  glShaderSource(*s, 1, (const GLchar**)&buf, &n_read);
+  glShaderSource(*s, 1, (const GLchar**) &buf, &n_read);
 
   free(buf);
 

@@ -24,9 +24,9 @@ int gl_load_static_indexed_drawable(drawable *d, uint32_t *data,
                GL_STATIC_DRAW);
 
   glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 3 * sizeof(uint32_t),
-                        (GLvoid *)0);
+                        (GLvoid *) 0);
   glVertexAttribIPointer(1, 1, GL_UNSIGNED_INT, 3 * sizeof(uint32_t),
-                         (GLvoid *)(2 * sizeof(uint32_t)));
+                         (GLvoid *) (2 * sizeof(uint32_t)));
 
   glBindVertexArray(0);
 
@@ -52,9 +52,9 @@ int gl_load_static_monochrome_drawable(drawable *d, uint32_t *data,
                GL_STATIC_DRAW);
 
   glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 3 * sizeof(uint32_t),
-                        (GLvoid *)0);
+                        (GLvoid *) 0);
   glVertexAttribPointer(1, 4, GL_UNSIGNED_BYTE, GL_FALSE, 3 * sizeof(uint32_t),
-                        (GLvoid *)(2 * sizeof(uint32_t)));
+                        (GLvoid *) (2 * sizeof(uint32_t)));
 
   glBindVertexArray(0);
 

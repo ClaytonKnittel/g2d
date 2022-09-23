@@ -93,14 +93,14 @@ class Renderer {
     m_texture = m_device->newTexture(texture_desc);
     texture_desc->release();
 
-    uint8_t *texture_data = (uint8_t *)malloc(tw * th * 4);
+    uint8_t *texture_data = (uint8_t *) malloc(tw * th * 4);
     for (uint64_t y = 0; y < th; y++) {
       for (uint64_t x = 0; x < tw; x++) {
-        float dx = 2 * ((float)x - (float)(tw - 1) / 2.f) / (tw - 1);
-        float dy = 2 * ((float)y - (float)(th - 1) / 2.f) / (th - 1);
+        float dx = 2 * ((float) x - (float) (tw - 1) / 2.f) / (tw - 1);
+        float dy = 2 * ((float) y - (float) (th - 1) / 2.f) / (th - 1);
 
         float dc = tanhf(dx * dx + dy * dy);
-        uint8_t dc_norm = (uint8_t)(dc * 0xff);
+        uint8_t dc_norm = (uint8_t) (dc * 0xff);
 
         texture_data[4 * (x + tw * y) + 0] = 0x30;
         texture_data[4 * (x + tw * y) + 1] = dc_norm;
@@ -211,11 +211,11 @@ class Renderer {
         reinterpret_cast<shader_types::InstanceData *>(
             instance_buf_ptr->contents());
     for (uint64_t i = 0; i < NUM_INSTANCES; i++) {
-      float angle = 4 * (float)i / (float)NUM_INSTANCES * 2.f * M_PI +
-                    (float)frame / 11.3f;
-      float frac = (float)i / (float)NUM_INSTANCES;
-      float x = (frac * 2.f - 1.f) + (1.f / (float)NUM_INSTANCES);
-      float y = sinf((frac + (float)frame / 200.f) * 2.f * M_PI);
+      float angle = 4 * (float) i / (float) NUM_INSTANCES * 2.f * M_PI +
+                    (float) frame / 11.3f;
+      float frac = (float) i / (float) NUM_INSTANCES;
+      float x = (frac * 2.f - 1.f) + (1.f / (float) NUM_INSTANCES);
+      float y = sinf((frac + (float) frame / 200.f) * 2.f * M_PI);
 
       instance_buf[i].instanceTransform = (simd::float3x3){
         (simd::float3){ scl * sinf(angle), scl * cosf(angle), 0.f },
