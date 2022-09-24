@@ -5,6 +5,7 @@
 #include <utils/fun/print_colors.h>
 
 #include <iostream>
+#include <memory>
 
 using TestPartResult = ::testing::TestPartResult;
 using TestInfo = ::testing::TestInfo;
@@ -36,6 +37,9 @@ static std::string CountableStr(T count, const char* singular,
   return ostr.str();
 }
 
+ViewedTestListener::ViewedTestListener()
+    : cur_suite_(nullptr), cur_info_(nullptr) {}
+
 void ViewedTestListener::OnTestProgramStart(const UnitTest& unit_test) {
   printf("[==========] Running %s from %s.\n",
          CountableStr(unit_test.total_test_count(), "test", "tests").c_str(),
@@ -63,11 +67,15 @@ void ViewedTestListener::OnTestSuiteStart(const TestSuite& test_suite) {
   printf(P_GREEN "[----------]" P_DEFAULT " %s from %s\n",
          CountableStr(test_suite.test_to_run_count(), "test", "tests").c_str(),
          test_suite.name());
+
+  cur_suite_ = &test_suite;
 }
 
 void ViewedTestListener::OnTestStart(const TestInfo& test_info) {
   printf(P_YELLOW "[ RUN      ]" P_DEFAULT " %s.%s\n",
          test_info.test_suite_name(), test_info.name());
+
+  cur_info_ = &test_info;
 }
 
 void ViewedTestListener::OnTestDisabled(const TestInfo& test_info) {
@@ -111,6 +119,8 @@ void ViewedTestListener::OnTestPartResult(
     return;
   }
 
+  res_map_.insert(
+      { { cur_suite_->name(), cur_info_->name() }, test_part_result });
   printf("%s\n", PrintTestPartResultToString(test_part_result).c_str());
 }
 
@@ -156,6 +166,8 @@ void ViewedTestListener::OnTestEnd(const TestInfo& test_info) {
   } else {
     printf("\n");
   }
+
+  cur_info_ = nullptr;
 }
 
 void ViewedTestListener::OnTestSuiteEnd(const TestSuite& test_suite) {
@@ -163,6 +175,8 @@ void ViewedTestListener::OnTestSuiteEnd(const TestSuite& test_suite) {
          test_suite.failed_test_count() == 0 ? P_GREEN : P_RED,
          CountableStr(test_suite.test_to_run_count(), "test", "tests").c_str(),
          test_suite.name(), test_suite.elapsed_time());
+
+  cur_suite_ = nullptr;
 }
 
 void ViewedTestListener::OnEnvironmentsTearDownStart(

@@ -43,12 +43,12 @@ target_compile_options(g2d_unit_testing PRIVATE $<$<COMPILE_LANGUAGE:C>:-std=gnu
 include(CheckCXXCompilerFlag)
 CHECK_CXX_COMPILER_FLAG("-std=c++17" COMPILER_SUPPORTS_CXX17)
 
-if (COMPILER_SUPPORTS_CXX17)
-	target_compile_options(g2d_unit_testing PRIVATE $<$<COMPILE_LANGUAGE:CXX>:-std=c++17>)
-else()
+if (NOT COMPILER_SUPPORTS_CXX17)
 	message(SEND_ERROR "The compiler ${CMAKE_CXX_COMPILER} does not support "
 		"c++17, please use a different compiler")
 endif()
+
+set_property(TARGET g2d_unit_testing PROPERTY CXX_STANDARD 17)
 
 target_compile_definitions(g2d_unit_testing PRIVATE DO_TESTING)
 
