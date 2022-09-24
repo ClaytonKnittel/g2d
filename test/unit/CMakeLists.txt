@@ -66,7 +66,7 @@ target_link_libraries(g2d_unit_testing
 		g2d utils "${LINK_LIBS}" GTest::GTest
 )
 
-get_filename_component(UTILS_DIR ../ ABSOLUTE)
+get_filename_component(UTILS_DIR ../../ ABSOLUTE)
 
 target_include_directories(g2d_unit_testing
 	PRIVATE

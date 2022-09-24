@@ -335,7 +335,7 @@ if (${ENABLE_TESTING})
 			check "${LINK_LIBS}"
 	)
 
-	add_subdirectory(test)
+	add_subdirectory(test/unit)
 endif()
 
 
