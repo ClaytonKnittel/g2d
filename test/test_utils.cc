@@ -185,7 +185,13 @@ void ViewedTestListener::RefreshTestMonitor() {
       ostr << P_RED "[  FAILED  ]";
     }
     ostr << P_DEFAULT " " << test_info->test_suite_name() << "."
-         << test_info->name() << "\n";
+         << test_info->name();
+
+    if (GTEST_FLAG_GET(print_time) && it->second == TestState::FINISHED) {
+      ostr << " (" << test_info->result()->elapsed_time() << " ms)\n";
+    } else {
+      ostr << "\n";
+    }
   }
 
   printf("%s", ostr.str().c_str());
