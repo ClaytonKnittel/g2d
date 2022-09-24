@@ -13,23 +13,6 @@ using TestInfo = ::testing::TestInfo;
 using TestSuite = ::testing::TestSuite;
 using UnitTest = ::testing::UnitTest;
 
-/*
-[==========] Running 3 tests from 1 test suite.
-[----------] Global test environment set-up.
-[----------] 3 tests from LogFixture
-[ RUN      ] LogFixture.TestLogNoArguments
-[       OK ] LogFixture.TestLogNoArguments (1 ms)
-[ RUN      ] LogFixture.TestLogStringArgument
-[       OK ] LogFixture.TestLogStringArgument (0 ms)
-[ RUN      ] LogFixture.TestLogIntArgument
-[       OK ] LogFixture.TestLogIntArgument (0 ms)
-[----------] 3 tests from LogFixture (1 ms total)
-
-[----------] Global test environment tear-down
-[==========] 3 tests from 1 test suite ran. (1 ms total)
-[  PASSED  ] 3 tests.
- */
-
 template <typename T>
 static std::string CountableStr(T count, const char* singular,
                                 const char* plural) {
@@ -206,8 +189,6 @@ void ViewedTestListener::InitTestMonitor() {
 void ViewedTestListener::CloseTestMonitor() {}
 
 void ViewedTestListener::PrintTestBegin(const TestInfo& info) {
-  // printf(P_YELLOW "[ RUN      ]" P_DEFAULT " %s.%s\n",
-  //        test_info.test_suite_name(), test_info.name());
   if (test_result_lines_.size() == n_test_lines_) {
     test_result_lines_.pop_front();
   }
@@ -255,9 +236,6 @@ void ViewedTestListener::OnEnvironmentsSetUpEnd(const UnitTest& unit_test) {
 
 void ViewedTestListener::OnTestSuiteStart(const TestSuite& test_suite) {
   RefreshTestMonitor();
-  // printf(P_GREEN "[----------]" P_DEFAULT " %s from %s\n",
-  //        CountableStr(test_suite.test_to_run_count(), "test",
-  //        "tests").c_str(), test_suite.name());
 
   cur_suite_ = &test_suite;
 }
@@ -267,14 +245,9 @@ void ViewedTestListener::OnTestStart(const TestInfo& test_info) {
 
   PrintTestBegin(test_info);
   RefreshTestMonitor();
-  // printf(P_YELLOW "[ RUN      ]" P_DEFAULT " %s.%s\n",
-  //        test_info.test_suite_name(), test_info.name());
 }
 
-void ViewedTestListener::OnTestDisabled(const TestInfo& test_info) {
-  // printf("[ DISABLED ] %s.%s\n", test_info.test_suite_name(),
-  // test_info.name());
-}
+void ViewedTestListener::OnTestDisabled(const TestInfo& test_info) {}
 
 void ViewedTestListener::OnTestPartResult(
     const TestPartResult& test_part_result) {
@@ -291,38 +264,11 @@ void ViewedTestListener::OnTestEnd(const TestInfo& test_info) {
   PrintTestFinish();
   RefreshTestMonitor();
 
-  /*
-  static const char* passed_str = P_GREEN "[       OK ]" P_DEFAULT " ";
-  static const char* skipped_str = P_GREEN "[  SKIPPED ]" P_DEFAULT " ";
-  static const char* failed_str = P_RED "[  FAILED  ]" P_DEFAULT " ";
-
-  const char* res_str;
-  if (test_info.result()->Passed()) {
-    res_str = passed_str;
-  } else if (test_info.result()->Passed()) {
-    res_str = skipped_str;
-  } else {
-    res_str = failed_str;
-  }
-
-  printf("%s%s.%s", res_str, test_info.test_suite_name(), test_info.name());
-
-  if (GTEST_FLAG_GET(print_time)) {
-    printf(" (%" PRId64 " ms)\n", test_info.result()->elapsed_time());
-  } else {
-    printf("\n");
-  }
-  */
-
   cur_info_ = nullptr;
 }
 
 void ViewedTestListener::OnTestSuiteEnd(const TestSuite& test_suite) {
   RefreshTestMonitor();
-  // printf("%s[----------]" P_DEFAULT " %s from %s (%" PRId64 " ms total)\n",
-  //      test_suite.failed_test_count() == 0 ? P_GREEN : P_RED,
-  //    CountableStr(test_suite.test_to_run_count(), "test", "tests").c_str(),
-  //  test_suite.name(), test_suite.elapsed_time());
 
   cur_suite_ = nullptr;
 }
