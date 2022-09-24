@@ -29,8 +29,6 @@ add_executable(g2d_unit_testing
 	${C_TEST_SRC} ${CXX_TEST_SRC}
 )
 
-gtest_discover_tests(g2d_unit_testing)
-
 add_custom_target(run_g2d_tests
 	COMMAND ${METAL_VALIDATION_ENV} ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}
 	DEPENDS g2d_unit_testing
@@ -65,7 +63,7 @@ target_link_directories(g2d_unit_testing
 
 target_link_libraries(g2d_unit_testing
 	PRIVATE
-		g2d utils "${LINK_LIBS}" GTest::GTest GTest::Main
+		g2d utils "${LINK_LIBS}" GTest::GTest
 )
 
 get_filename_component(UTILS_DIR ../ ABSOLUTE)
