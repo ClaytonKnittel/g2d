@@ -41,6 +41,9 @@ set(BUILD_SHARED_LIBS ON CACHE BOOL "When enabled, builds libg2d as a
 set(ENABLE_TESTING OFF CACHE BOOL "When enabled, build all unit tests. The
 	unit tests can then be run from within the build directory with
 	'make run_tests'.")
+set(BUILD_EXAMPLES OFF CACHE BOOL "When enabled, build all examples. The
+	examples can then be run from within the build directory with
+	'make run_<example_name>'.")
 
 
 ############################################################
@@ -336,6 +339,10 @@ if (${ENABLE_TESTING})
 	)
 
 	add_subdirectory(test/unit)
+endif()
+
+if (${BUILD_EXAMPLES})
+  add_subdirectory(examples/test)
 endif()
 
 

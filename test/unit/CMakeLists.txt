@@ -30,7 +30,7 @@ add_executable(g2d_unit_testing
 )
 
 add_custom_target(run_g2d_tests
-	COMMAND ${METAL_VALIDATION_ENV} ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}
+	COMMAND ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}
 	DEPENDS g2d_unit_testing
 )
 
