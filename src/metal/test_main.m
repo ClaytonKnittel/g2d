@@ -149,15 +149,16 @@ void app_main(int argc, char *argv[])
     [menu addItem:quit];
     NSApp.mainMenu = bar;
 
-    //NSMenuItem *windowMenuItem = [[NSMenuItem alloc] init];
-    //NSMenu *windowMenu = [[NSMenu alloc] init:@"Window"];
+    // NSMenuItem *windowMenuItem = [[NSMenuItem alloc] init];
+    // NSMenu *windowMenu = [[NSMenu alloc] init:@"Window"];
 
     // Window.
     NSRect frame = NSMakeRect(0, 0, 800, 800);
-    NSWindow *window = [[NSWindow alloc] initWithContentRect:frame
-                                                   styleMask:NSWindowStyleMaskTitled | NSWindowStyleMaskClosable | NSWindowStyleMaskMiniaturizable
-                                                     backing:NSBackingStoreBuffered
-                                                       defer:NO];
+    NSWindow *window = [[NSWindow alloc]
+        initWithContentRect:frame
+                  styleMask:NSWindowStyleMaskTitled | NSWindowStyleMaskClosable | NSWindowStyleMaskMiniaturizable
+                    backing:NSBackingStoreBuffered
+                      defer:NO];
     [window cascadeTopLeftFromPoint:NSMakePoint(20, 20)];
     window.title = [[NSProcessInfo processInfo] processName];
     [window makeKeyAndOrderFront:nil];
