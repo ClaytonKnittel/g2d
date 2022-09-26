@@ -251,12 +251,6 @@ set_property(TARGET g2d PROPERTY CXX_STANDARD 17)
 
 if(USE_METAL)
 	target_compile_definitions(g2d PUBLIC USE_METAL)
-
-	target_include_directories(g2d
-		PRIVATE
-			${PROJECT_SOURCE_DIR}/modules/metal-cpp
-			${PROJECT_SOURCE_DIR}/modules/metal-cpp-extensions
-	)
 elseif(USE_OPENGL)
 	target_compile_definitions(g2d PUBLIC USE_OPENGL)
 
