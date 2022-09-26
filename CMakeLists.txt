@@ -91,12 +91,12 @@ if(USE_METAL)
 
 project(g2d_metal_shaders)
 
-file(GLOB_RECURSE METAL_TEST_SRC
+file(GLOB_RECURSE METAL_SHADERS_SRC
 	"${PROJECT_SOURCE_DIR}/src/*.metal"
 )
 
 add_library(g2d_metal_shaders SHARED
-	${METAL_TEST_SRC}
+  ${METAL_SHADERS_SRC}
 )
 
 set_target_properties(g2d_metal_shaders PROPERTIES SUFFIX ".metallib")

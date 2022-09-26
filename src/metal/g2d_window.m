@@ -3,8 +3,8 @@
 #include <MetalKit/MetalKit.h>
 
 #include <g2d/metal/internal/g2d_app_delegate_objc.h>
+#include <g2d/metal/internal/g2d_library_objc.h>
 #include <g2d/metal/internal/g2d_window_objc.h>
-#include <g2d/metal/metal_shader_lib_source.h>
 
 void *_Nullable allocAndInitG2DWindow(float w, float h, const char *_Nonnull title)
 {
@@ -22,6 +22,7 @@ void startMetalExecution(void *_Nonnull g2d_window_ptr)
 
 @implementation G2DWindow {
   G2DAppDelegate *app_delegate_;
+  G2DLibrary *library_;
   NSWindow *window_;
 }
 
@@ -94,6 +95,8 @@ void startMetalExecution(void *_Nonnull g2d_window_ptr)
     G2DAppDelegate *delegate = [[G2DAppDelegate alloc] init];
     [NSApp setDelegate:delegate];
   }
+
+  library_ = [[G2DLibrary alloc] init];
 }
 
 - (void)drawRect:(CGRect)rect
