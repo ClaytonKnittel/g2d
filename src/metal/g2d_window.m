@@ -35,6 +35,7 @@ void startMetalExecution(void *_Nonnull g2d_window_ptr)
   return self;
 }
 
+#include <syslog.h>
 - (void)start
 {
   [NSApp run];
@@ -53,11 +54,6 @@ void startMetalExecution(void *_Nonnull g2d_window_ptr)
 - (BOOL)resignFirstResponder
 {
   return true;
-}
-
-- (void)termAction
-{
-  NSLog(@"CLOSING!");
 }
 
 - (void)setupMenuBar
