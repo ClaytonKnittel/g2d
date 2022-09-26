@@ -12,7 +12,6 @@ extern "C" {
 #elif defined(USE_METAL)
 
 #include <g2d/metal/g2d_window.h>
-#include <g2d/metal/test_main.h>
 
 #endif
 
@@ -30,11 +29,5 @@ typedef struct g2d_context {
 
   const char* title;
 } g2d_context_t;
-
-/*
- */
-int g2d_start();
-
-int call_test_ray();
 
 #endif /* _G2D_H */
