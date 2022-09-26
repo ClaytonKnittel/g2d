@@ -11,7 +11,7 @@ extern "C" {
 
 #elif defined(USE_METAL)
 
-#include <g2d/metal/metal.h>
+#include <g2d/metal/g2d_window.h>
 #include <g2d/metal/test_main.h>
 
 #endif
