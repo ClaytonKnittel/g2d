@@ -21,7 +21,6 @@
     id<MTLFunction> frag_fn = [mtl_library newFunctionWithName:fragment_fn_name];
 
     MTLRenderPipelineDescriptor *pipeline_desc = [MTLRenderPipelineDescriptor new];
-    pipeline_desc.sampleCount = 4;
     pipeline_desc.vertexFunction = vert_fn;
     pipeline_desc.fragmentFunction = frag_fn;
     pipeline_desc.vertexDescriptor = vertex_descriptor;
