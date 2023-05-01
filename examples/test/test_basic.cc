@@ -10,8 +10,6 @@
 #include <g2d/openal/al.h>
 #endif
 
-#include <check.h>
-
 static uint32_t f2i(float f) {
   union cvt_f2i {
     int int_val;
@@ -25,7 +23,7 @@ int main() {
 #ifdef USE_METAL
   // call_test_ray();
   // app_main(0, NULL);
-  g2d::metal::MetalWindow window(800, 600, "test window!");
+  g2d::metal::Window window(800, 600, "test window!");
   window.start();
 #else
   // return call_test_ray();

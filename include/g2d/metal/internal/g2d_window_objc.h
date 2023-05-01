@@ -11,4 +11,6 @@ void startMetalExecution(void *_Nonnull g2d_window) __asm__("_startMetalExecutio
 
 - (void)start;
 
+- (id<MTLDevice> _Nonnull)mtlDevice;
+
 @end

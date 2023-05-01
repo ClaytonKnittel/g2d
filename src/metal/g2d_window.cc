@@ -10,11 +10,19 @@ namespace g2d {
 
 namespace metal {
 
-MetalWindow::MetalWindow(float w, float h, const char* title)
+Window::Window(float w, float h, const char* title)
     : objc_window_(allocAndInitG2DWindow(w, h, title)) {}
 
-void MetalWindow::start() {
+void Window::start() {
   startMetalExecution(objc_window_);
+}
+
+void* Window::objc_window() {
+  return objc_window_;
+}
+
+MTLBuffer Window::newBuffer(std::size_t length) {
+  return MTLBuffer(*this, length);
 }
 
 } /* namespace metal */

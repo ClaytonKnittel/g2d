@@ -1,25 +1,18 @@
-#ifndef _G2D_H
-#define _G2D_H
+#pragma once
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
+#include <cstdint>
+#include <string>
 
 #ifdef USE_OPENGL
-
 #include <g2d/opengl/gl.h>
-
 #elif defined(USE_METAL)
-
 #include <g2d/metal/g2d_window.h>
-
 #endif
 
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
+namespace g2d {
 
-typedef struct g2d_context {
+class Context {
+ private:
   uint32_t width;
   uint32_t height;
 
@@ -27,7 +20,7 @@ typedef struct g2d_context {
 
   // color_t background_color;
 
-  const char* title;
-} g2d_context_t;
+  std::string title;
+};
 
-#endif /* _G2D_H */
+}  // namespace g2d

@@ -44,6 +44,8 @@ set(ENABLE_TESTING OFF CACHE BOOL "When enabled, build all unit tests. The
 set(BUILD_EXAMPLES OFF CACHE BOOL "When enabled, build all examples. The
 	examples can then be run from within the build directory with
 	'make run_<example_name>'.")
+set(BACKEND "" CACHE STRING "The graphics backend to use, either \"OpenGL\" or
+	\"Metal\". If none is given, the platform default will be used.")
 
 
 ############################################################
@@ -56,12 +58,17 @@ set(OPENGL_PLATFORMS Linux)
 #set(OPENGL_PLATFORMS Darwin Linux)
 
 # check for graphics library support
-set(USE_METAL OFF)
-set(USE_OPENGL OFF)
-
-if(CMAKE_SYSTEM_NAME IN_LIST METAL_PLATFORMS)
+if(${BACKEND} MATCHES "OpenGL")
+	set(USE_METAL OFF)
+	set(USE_OPENGL ON)
+elseif(${BACKEND} MATCHES "Metal")
 	set(USE_METAL ON)
+	set(USE_OPENGL OFF)
+elseif(CMAKE_SYSTEM_NAME IN_LIST METAL_PLATFORMS)
+	set(USE_METAL ON)
+	set(USE_OPENGL OFF)
 elseif(CMAKE_SYSTEM_NAME IN_LIST OPENGL_PLATFORMS)
+	set(USE_METAL OFF)
 	set(USE_OPENGL ON)
 else()
 	message(SEND_ERROR "System not supported: ${CMAKE_SYSTEM_NAME}")
@@ -181,11 +188,11 @@ endif()
 
 if(${BUILD_SHARED_LIBS})
 	add_library(g2d SHARED
-		${C_SRC} ${CXX_SRC} ${OBJC_SRC} ${ASM_SRC}
+    ${C_SRC} ${CXX_SRC} ${OBJC_SRC} ${ASM_SRC}
 	)
 else()
 	add_library(g2d STATIC
-		${C_SRC} ${CXX_SRC} ${OBJC_SRC} ${ASM_SRC}
+    ${C_SRC} ${CXX_SRC} ${OBJC_SRC} ${ASM_SRC}
 	)
 endif()
 

@@ -43,6 +43,11 @@ void startMetalExecution(void *_Nonnull g2d_window_ptr)
   [NSApp run];
 }
 
+- (id<MTLDevice> _Nonnull)mtlDevice
+{
+  return device_;
+}
+
 - (BOOL)acceptsFirstResponder
 {
   return true;
