@@ -19,11 +19,14 @@ static uint32_t f2i(float f) {
   return tmp.int_val;
 }
 
+void render_cb(g2d::metal::Window* window) {}
+
 int main() {
 #ifdef USE_METAL
   // call_test_ray();
   // app_main(0, NULL);
   g2d::metal::Window window(800, 600, "test window!");
+  window.registerRenderCallback(render_cb);
   window.start();
 #else
   // return call_test_ray();

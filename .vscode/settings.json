@@ -2,7 +2,8 @@
   "cmake.configureArgs": [
     "-DBUILD_EXAMPLES=ON",
     "-DENABLE_TESTING=ON",
-    "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON"
+    "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+    "-DCMAKE_BUILD_TYPE=Debug"
   ],
   "files.associations": {
     "*.m": "objective-cpp",
@@ -93,6 +94,7 @@
     "semaphore": "cpp",
     "stop_token": "cpp",
     "thread": "cpp",
-    "cinttypes": "cpp"
+    "cinttypes": "cpp",
+    "*_objc.h": "objective-cpp"
   }
 }

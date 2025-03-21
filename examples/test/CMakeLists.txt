@@ -18,18 +18,18 @@ file(GLOB_RECURSE CXX_SRC
 	"${PROJECT_SOURCE_DIR}/*.cc"
 )
 
-add_executable(g2d_test_example MACOSX_BUNDLE
+add_executable(g2d_test_example #MACOSX_BUNDLE
   ${CXX_SRC}
   "${CMAKE_SOURCE_DIR}/examples/test/stardew.icns"
 )
 
-set_target_properties(g2d_test_example PROPERTIES
-  OUTPUT_NAME "G2D Test Example"
-  RESOURCE "${CMAKE_SOURCE_DIR}/examples/test/stardew.icns")
+# set_target_properties(g2d_test_example PROPERTIES
+#   OUTPUT_NAME "G2D Test Example"
+#   RESOURCE "${CMAKE_SOURCE_DIR}/examples/test/stardew.icns")
 
-set_property(TARGET g2d_test_example PROPERTY MACOSX_BUNDLE_BUNDLE_NAME "g2d")
-set_property(TARGET g2d_test_example PROPERTY MACOSX_BUNDLE_BUNDLE_VERSION "1.0")
-set_property(TARGET g2d_test_example PROPERTY MACOSX_BUNDLE_ICON_FILE "stardew")
+# set_property(TARGET g2d_test_example PROPERTY MACOSX_BUNDLE_BUNDLE_NAME "g2d")
+# set_property(TARGET g2d_test_example PROPERTY MACOSX_BUNDLE_BUNDLE_VERSION "1.0")
+# set_property(TARGET g2d_test_example PROPERTY MACOSX_BUNDLE_ICON_FILE "stardew")
 
 add_custom_target(run_g2d_test_example
 	COMMAND ${METAL_VALIDATION_ENV} ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}

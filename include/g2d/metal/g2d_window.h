@@ -7,6 +7,8 @@ namespace g2d {
 
 namespace metal {
 
+typedef void (*RenderCallbackFn)(Window*);
+
 class Window {
  public:
   Window(float w, float h, const char* title);
@@ -16,6 +18,8 @@ class Window {
   void* objc_window();
 
   MTLBuffer newBuffer(std::size_t length);
+
+  void registerRenderCallback(RenderCallbackFn callback);
 
  private:
   void* objc_window_;
